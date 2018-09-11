@@ -1,0 +1,3 @@
+(function(Window, undefined){
+
+})(Window)
