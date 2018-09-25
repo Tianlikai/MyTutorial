@@ -131,4 +131,5 @@ LHS 和 RHS 引用都会在当前作用域进行查找，如果没有找到，�
 ### 来源
 
 - 原文地址: [JavaScript 作用域](https://github.com/Tianlikai/MyTutorial/blob/master/scope/READE.md)
+- JavaScript 词法作用域: [JavaScript 词法作用域](https://juejin.im/post/5ba9fefcf265da0afb33492c)
 - react 撸后台: [企业级中后台项目](https://juejin.im/post/5b715c006fb9a009b628faaa)
