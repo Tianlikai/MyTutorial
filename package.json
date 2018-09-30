@@ -1,11 +1,23 @@
 {
-  "name": "tool",
+  "name": "re_react",
   "version": "1.0.0",
-  "description": "",
-  "main": "js_class/index.js",
+  "description": "思维导图 ![](./ThinkingPirate.png)",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=dev webpack --mode=development",
+    "build": "rm -rf dist/* && cross-env NODE_ENV=pro webpack --mode=production"
   },
-  "author": "jason T",
-  "license": "ISC"
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "cross-env": "^5.2.0",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
 }
