@@ -17,12 +17,12 @@ ReactDOMTextComponent.prototype.mountComponent = function(rootID) {
   );
 };
 
-// ReactDomElement 类型
-function ReactDomElement(element) {
+// ReactDOMComponent 类型
+function ReactDOMComponent(element) {
   this._currentElement = element;
   this._rootId = null;
 }
-ReactDomElement.prototype.mountComponent = function(rootID) {
+ReactDOMComponent.prototype.mountComponent = function(rootID) {
   this._rootID = rootID;
   var props = this._currentElement.props;
   var tagOpen = "<" + this._currentElement.type;
@@ -78,14 +78,54 @@ ReactDomElement.prototype.mountComponent = function(rootID) {
   return tagOpen + ">" + content + tagClose;
 };
 
+function ReactCompositeComponent(element) {
+  this._currentElement = element;
+  this._rootNodeID = null;
+  this._instance = null;
+}
+ReactCompositeComponent.prototype.mountComponent = function(rootID) {
+  this._rootNodeID = rootID;
+  var publicProps = this._currentElement.props;
+  var ReactClass = this._currentElement.type;
+
+  var inst = new ReactClass(publicProps);
+  this._instance = inst;
+  inst._reactInternalInstance = this;
+
+  if (inst.componentWillMount) {
+    inst.componentWillMount();
+  }
+
+  var renderedElement = this._instance.render();
+  var renderedComponentInstance = instantiateReactComponent(renderedElement);
+  this._renderedComponent = renderedComponentInstance;
+  var renderedMarkup = renderedComponentInstance.mountComponent(
+    this._rootNodeID
+  );
+
+  //之前我们在React.render方法最后触发了mountReady事件，所以这里可以监听，在渲染完成后会触发。
+  $(document).on("mountReady", function() {
+    //调用inst.componentDidMount
+    inst.componentDidMount && inst.componentDidMount();
+  });
+
+  return renderedMarkup;
+};
+
+function ReactClass() {}
+
+ReactClass.prototype.render = function() {};
+
 // 实例化
 function instantiateReactComponent(node) {
   if (typeof node === "string" || typeof node === "number") {
     // 文本类型
     return new ReactDOMTextComponent(node);
   } else if (typeof node === "object" && typeof node.type === "string") {
-    // ReactDomElement
+    // ReactDOMComponent
     return new ReactDOMComponent(node);
+  } else if (typeof node === "object" && typeof node.type === "function") {
+    return new ReactCompositeComponent(node);
   }
 }
 
@@ -134,6 +174,19 @@ const React = {
 
     // 返回一个ReactElement实例对象
     return new ReactElement(type, props, key);
+  },
+
+  createClass: function(spec) {
+    function Constructor(props) {
+      this.props = props;
+      this.state = this.getInitialState ? this.getInitialState() : null;
+    }
+    Constructor.prototype = new ReactClass();
+    Constructor.prototype.constructor = Constructor;
+
+    // 混入 spec 的原型
+    $.extend(Constructor.prototype, spec);
+    return Constructor;
   },
 
   render: function(element, container) {
