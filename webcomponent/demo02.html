@@ -1,0 +1,56 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>作用域隔离</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script>
+        // 作用域隔离，添加命名空间
+        // 所有变量放在textCount对象中，没有污染
+
+        /**
+         * 问题
+         * 但是还是有些瑕疵，这种写法没有私有的概念
+         * 比如上面的getNum,bind应该都是私有的方法。
+         * 但是其他代码可以很随意的改动这些。当代码量特别特别多的时候，很容易出现变量重复，或被修改的问题。
+         **/
+
+        var textCount = {
+            input: null,
+            init: function (config) {
+                this.input = $(config.id)
+                this.bind()
+                return this
+            },
+            bind: function () {
+                var self = this
+                this.input.on('keyup', function () {
+                    self.render()
+                })
+            },
+            getNum: function () {
+                return this.input.val().length
+            },
+            render: function () {
+                var num = this.getNum()
+                if ($('#J_input_count').length === 0) {
+                    this.input.after('<span id="J_input_count"></span>');
+                }
+                $('#J_input_count').html(num + '个字')
+            }
+        }
+
+        $(function () {
+            textCount.init({ id: '#J_input' }).render()
+        })
+
+    </script>
+</head>
+
+<body>
+    <input type="text" id="J_input" />
+</body>
+
+</html>

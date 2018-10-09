@@ -1,0 +1,47 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>立即执行闭包</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script>
+        var TextCount = (function () {
+            var _bind = function (that) {
+                that.input.on('keyup', function () {
+                    that.render()
+                })
+            }
+            var _getNum = function (that) {
+                return that.input.val().length
+            }
+
+            var TextCountFun = function (config) { }
+            TextCountFun.prototype.init = function (config) {
+                this.input = $(config.id)
+                _bind(this)
+                return this
+            }
+            TextCountFun.prototype.render = function () {
+                var num = _getNum(this)
+                if ($('#J_input_count').length === 0) {
+                    this.input.after('<span id="J_input_count"></span>');
+                }
+                $('#J_input_count').html(num + '个字')
+            }
+            return TextCountFun
+        })()
+
+        $(function () {
+            new TextCount().init({ id: '#J_input' }).render()
+        })
+
+    </script>
+</head>
+
+<body>
+    <input type="text" id="J_input" />
+</body>
+
+</html>
