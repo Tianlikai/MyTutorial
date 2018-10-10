@@ -6,42 +6,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>抽象组件编写的基类</title>
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="../observerMode/index.js"></script>
+    <script src="./Component.js"></script>
     <script>
-        var TextCount = ComponentBase.extend({
-            _getNum: function () {
-                return this.get('input').val().length
-            },
-            bind: function () {
-                var self = this
-                this.get('input').on('keyup', function () {
-                    self.notice('Text.input', self._getNum())
-                    self.render()
-                })
-            },
-            render: function () {
-                var num = this._getNum();
-                if ($('#J_input_count').length == 0) {
-                    this.get('input').after('<span id="J_input_count"></span>');
-                };
-
-                $('#J_input_count').html(num + '个字');
-            }
-        })
-
         $(function () {
-            var instance = new TextCount({ input: $("#J_input") })
-            instance.on('Text.input', function (num) {
-                if (num > 10) {
-                    alert('超过了10个字了。。。')
-                }
-            })
+            // 传入parentNode节点，组件会挂载到这个节点上。所有事件都会代理到这个上面。
+            new TextCount({
+                parentNode: $("#J_test_container")
+            });
         })
     </script>
 </head>
 
 <body>
-    <input type="text" id="J_input" />
+    <div id="J_test_container">
+        <input type="text" id="J_input" />
+    </div>
 </body>
 
 </html>
