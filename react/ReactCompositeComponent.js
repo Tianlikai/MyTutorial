@@ -11,6 +11,7 @@ function ReactCompositeComponent(element) {
   this._instance = null;
 }
 
+// 首次装载
 ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   this._rootNodeID = rootID;
 
@@ -51,10 +52,12 @@ ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   return renderedMarkup;
 };
 
+// 更新状态
 ReactCompositeComponent.prototype.receiveComponent = function(
   nextElement,
   newState
 ) {
+  debugger
   this._currentElement = nextElement || this._currentElement;
   var inst = this._instance;
 
@@ -66,7 +69,7 @@ ReactCompositeComponent.prototype.receiveComponent = function(
   // 改写state
   inst.state = nextState;
 
-  // 如果inst有shouldComponentUpdate并且返回false。说明组件本身判断不要更新，就直接返回。
+  // 如果 inst 有 shouldComponentUpdate 并且返回 false。说明组件本身判断不要更新，就直接返回。
   if (
     inst.shouldComponentUpdate &&
     inst.shouldComponentUpdate(nextProps, nextState) === false
@@ -95,12 +98,14 @@ ReactCompositeComponent.prototype.receiveComponent = function(
   } else {
     // 如果发现完全是不同的两种element，那就干脆重新渲染了
     var thisID = this._rootNodeID;
-    // 重新new一个对应的component，
+
+    // 重新 new 一个对应的 component
     this._renderedComponent = this._instantiateReactComponent(
       nextRenderedElement
     );
     // 重新生成对应的元素内容
     var nextMarkup = _renderedComponent.mountComponent(thisID);
+
     // 替换整个节点
     $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
   }

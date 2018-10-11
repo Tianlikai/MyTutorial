@@ -10485,8 +10485,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-//用来判定两个element需不需要更新
-//这里的key是我们createElement的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
+// 用来判定两个element需不需要更新
+// 这里的 key 是我们 createElement 的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
 function _shouldUpdateReactComponent(prevElement, nextElement) {
   if (prevElement != null && nextElement != null) {
     var prevType = typeof prevElement;
@@ -10608,6 +10608,7 @@ function ReactClass() {}
 ReactClass.prototype.render = function () {};
 
 ReactClass.prototype.setState = function (newState) {
+  // ReactCompositeComponent.prototype.mountComponent 装载时保存的当前实例
   this._reactInternalInstance.receiveComponent(null, newState);
 };
 
@@ -10636,6 +10637,7 @@ function ReactCompositeComponent(element) {
   this._instance = null;
 }
 
+// 首次装载
 ReactCompositeComponent.prototype.mountComponent = function (rootID) {
   this._rootNodeID = rootID;
 
@@ -10674,7 +10676,9 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
   return renderedMarkup;
 };
 
+// 更新状态
 ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
+  debugger;
   this._currentElement = nextElement || this._currentElement;
   var inst = this._instance;
 
@@ -10686,7 +10690,7 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
   // 改写state
   inst.state = nextState;
 
-  // 如果inst有shouldComponentUpdate并且返回false。说明组件本身判断不要更新，就直接返回。
+  // 如果 inst 有 shouldComponentUpdate 并且返回 false。说明组件本身判断不要更新，就直接返回。
   if (inst.shouldComponentUpdate && inst.shouldComponentUpdate(nextProps, nextState) === false) {
     return null;
   }
@@ -10712,10 +10716,12 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
   } else {
     // 如果发现完全是不同的两种element，那就干脆重新渲染了
     var thisID = this._rootNodeID;
-    // 重新new一个对应的component，
+
+    // 重新 new 一个对应的 component
     this._renderedComponent = this._instantiateReactComponent(nextRenderedElement);
     // 重新生成对应的元素内容
     var nextMarkup = _renderedComponent.mountComponent(thisID);
+
     // 替换整个节点
     $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
   }
@@ -10744,6 +10750,7 @@ function ReactDOMComponent(element) {
   this._rootNodeID = null;
 }
 
+// 首次装载
 ReactDOMComponent.prototype.mountComponent = function (rootID) {
   this._rootNodeID = rootID;
   var props = this._currentElement.props;
@@ -10816,6 +10823,7 @@ function ReactDOMTextComponent(text) {
   this._rootId = null;
 }
 
+// 首次装载      
 ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
   this._rootId = rootID;
   return '<span data-reactid="' + rootID + '">' + this._currentElement + "</span>";
@@ -10871,7 +10879,7 @@ var HelloMessage = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createClass({
   },
   render: function () {
     return _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", {
-      onclick: this.changeType
+      onclick: this.changeType.bind(this) // 绑定 this 指向
     }, this.state.type, "Hello", this.props.name);
   }
 });

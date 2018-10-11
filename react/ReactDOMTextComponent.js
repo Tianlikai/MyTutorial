@@ -4,6 +4,7 @@ function ReactDOMTextComponent(text) {
   this._rootId = null;
 }
 
+// 首次装载      
 ReactDOMTextComponent.prototype.mountComponent = function(rootID) {
   this._rootId = rootID;
   return (

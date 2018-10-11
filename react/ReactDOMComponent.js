@@ -6,6 +6,7 @@ function ReactDOMComponent(element) {
   this._rootNodeID = null;
 }
 
+// 首次装载
 ReactDOMComponent.prototype.mountComponent = function(rootID) {
   this._rootNodeID = rootID;
   var props = this._currentElement.props;

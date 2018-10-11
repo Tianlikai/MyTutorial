@@ -17,7 +17,7 @@ var HelloMessage = React.createClass({
     return React.createElement(
       "div",
       {
-        onclick: this.changeType
+        onclick: this.changeType.bind(this) // 绑定 this 指向
       },
       this.state.type,
       "Hello",

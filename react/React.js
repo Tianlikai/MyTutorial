@@ -5,8 +5,8 @@ import ReactDOMTextComponent from "./ReactDOMTextComponent";
 import ReactDOMComponent from "./ReactDOMComponent";
 import ReactCompositeComponent from "./ReactCompositeComponent";
 
-//用来判定两个element需不需要更新
-//这里的key是我们createElement的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
+// 用来判定两个element需不需要更新
+// 这里的 key 是我们 createElement 的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
 export function _shouldUpdateReactComponent(prevElement, nextElement) {
   if (prevElement != null && nextElement != null) {
     var prevType = typeof prevElement;
