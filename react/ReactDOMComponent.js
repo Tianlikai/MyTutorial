@@ -67,4 +67,100 @@ ReactDOMComponent.prototype.mountComponent = function(rootID) {
   return tagOpen + ">" + content + tagClose;
 };
 
+/**
+ * 更新
+ * 基本元素更新
+ * 1: 属性更新（特殊属性，事件处理）
+ * 2: 子节点更新
+ *    diff  拿新的子节点树跟以前老的子节点树对比，找出他们之间的差别。
+ *    patch 所有差别找出后，再一次性的去更新。
+ * @param {*} nextElement
+ */
+ReactDOMComponent.propKey.receiveComponent = function(nextElement) {
+  var lastProps = this._currentElement.props;
+  var nextProps = nextElement.props;
+
+  this._currentElement = nextElement;
+
+  // 更新属性
+  this._updateDomProperties(lastProps, nextProps);
+  // 更新子节点
+  this._updateDOMChildren(nextElement.props.children);
+};
+
+/**
+ * 更新属性
+ * @param {*} lastProps
+ * @param {*} nextProps
+ */
+ReactDOMComponent.prototype._updateDomProperties = function(
+  lastProps,
+  nextProps
+) {
+  var propKey;
+
+  // 当老的属性不在新的属性中时，则从dom中将该属性删除
+  for (propKey in lastProps) {
+    // 跳过 出现在新的属性里或者是存在原型上的
+    if (
+      nextProps.hasOwnProperty(propKey) ||
+      !lastProps.hasOwnProperty(propKey)
+    ) {
+      continue;
+    }
+
+    // 事件监听相关的，取消事件监听
+    if (/^on[A-Za-z]/.test(propKey)) {
+      var eventType = propKey.replace("on", "");
+      // 取消该事件的事件委托
+      $(document).undelegate(
+        '[data-reactid="' + this._rootNodeID + '"]',
+        eventType,
+        lastProps[propKey]
+      );
+      continue;
+    }
+    // 删除属性
+    $('[data-reactid="' + this._rootNodeID + '"]').removeAttr(propKey);
+  }
+
+  // 将新的属性写入dom
+  for (propKey in nextProps) {
+    // 对于事件监听的属性我们需要特殊处理
+    if (/^on[A-Za-z]/.test(propKey)) {
+      var eventType = propKey.replace("on", "");
+      // 以前如果已经有，说明有了监听，需要先去掉
+      lastProps[propKey] &&
+        $(document).undelegate(
+          '[data-reactid="' + this._rootNodeID + '"]',
+          eventType,
+          lastProps[propKey]
+        );
+      // 针对当前的节点添加事件代理,以_rootNodeID为命名空间
+      $(document).delegate(
+        '[data-reactid="' + this._rootNodeID + '"]',
+        eventType + "." + this._rootNodeID,
+        nextProps[propKey]
+      );
+      continue;
+    }
+
+    if (propKey === "children") {
+      continue;
+    }
+
+    // 添加新的属性，更新同名属性
+    $(`[data-reactid="` + this._rootNodeID + '"]').prop(
+      propKey,
+      nextProps[propKey]
+    );
+  }
+};
+
+/**
+ * 更新子节点
+ * @param {*} children
+ */
+ReactDOMComponent.prototype._updateDOMChildren = function(children) {};
+
 export default ReactDOMComponent;

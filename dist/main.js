@@ -10638,7 +10638,10 @@ function ReactCompositeComponent(element) {
   this._instance = null;
 }
 
-// 首次装载
+/**
+ * 首次装载
+ * @param {*} rootID
+ */
 ReactCompositeComponent.prototype.mountComponent = function (rootID) {
   this._rootNodeID = rootID;
 
@@ -10677,10 +10680,12 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
   return renderedMarkup;
 };
 
-// 更新状态
+/**
+ * 更新
+ * @param {*} nextElement
+ * @param {*} newState
+ */
 ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
-  debugger;
-
   this._currentElement = nextElement || this._currentElement;
 
   // 复合组件实例
@@ -10827,19 +10832,34 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-// React 文本
+/* WEBPACK VAR INJECTION */(function($) {// React 文本
 function ReactDOMTextComponent(text) {
   this._currentElement = "" + text;
   this._rootId = null;
 }
 
-// 首次装载      
+/**
+ * 首次装载
+ **/
 ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
   this._rootId = rootID;
   return '<span data-reactid="' + rootID + '">' + this._currentElement + "</span>";
 };
 
+/**
+ * 更新文本节点
+ * @param {*} nextText
+ */
+ReactDOMTextComponent.prototype.receiveComponent = function (nextText) {
+  var nextStringText = "" + nextText;
+  if (nextStringText !== this._currentElement) {
+    this._currentElement = nextStringText;
+    $('[data-reactid="' + this._rootNodeID + '"]').html(this._currentElement);
+  }
+};
+
 /* harmony default export */ __webpack_exports__["default"] = (ReactDOMTextComponent);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
 
 /***/ }),
 
