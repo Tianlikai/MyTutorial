@@ -1,5 +1,10 @@
 import { instantiateReactComponent } from "./React";
 
+// 全局更新深度标识
+var updateDepth = 0;
+// 全局更新队列，保存所有差异
+var diffQueue = [];
+
 // ReactDOMComponent
 function ReactDOMComponent(element) {
   this._currentElement = element;
@@ -161,6 +166,20 @@ ReactDOMComponent.prototype._updateDomProperties = function(
  * 更新子节点
  * @param {*} children
  */
-ReactDOMComponent.prototype._updateDOMChildren = function(children) {};
+ReactDOMComponent.prototype._updateDOMChildren = function(
+  nextChildrenElements
+) {
+  updateDepth++;
+
+  // 分析差异
+  this._diff(diffQueue, nextChildrenElements);
+
+  updateDepth--;
+  if (updateDepth === 0) {
+    // 执行具体的dom操作
+    this._patch(diffQueue);
+    diffQueue = [];
+  }
+};
 
 export default ReactDOMComponent;
