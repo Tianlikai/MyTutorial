@@ -1,4 +1,4 @@
-// React 文本类型
+// React 文本
 function ReactDOMTextComponent(text) {
   this._currentElement = "" + text;
   this._rootId = null;

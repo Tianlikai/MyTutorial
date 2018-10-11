@@ -1,6 +1,6 @@
 import { instantiateReactComponent } from "./React";
 
-// ReactDOMComponent 类型
+// ReactDOMComponent
 function ReactDOMComponent(element) {
   this._currentElement = element;
   this._rootNodeID = null;

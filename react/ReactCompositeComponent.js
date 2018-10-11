@@ -4,7 +4,7 @@ import {
   _shouldUpdateReactComponent
 } from "./React";
 
-// 自定义组件
+// 自定义类型
 function ReactCompositeComponent(element) {
   this._currentElement = element;
   this._rootNodeID = null;
@@ -20,7 +20,7 @@ ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   // this._currentElement.type 为 Constructor 构造函数类
   var ReactClass = this._currentElement.type;
 
-  // 实例化 一个 复合组件
+  // 实例化 一个 Constructor
   var inst = new ReactClass(publicProps);
 
   this._instance = inst;
@@ -59,6 +59,8 @@ ReactCompositeComponent.prototype.receiveComponent = function(
 ) {
   debugger
   this._currentElement = nextElement || this._currentElement;
+
+  // 
   var inst = this._instance;
 
   // 合并state
