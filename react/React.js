@@ -94,6 +94,7 @@ const React = {
      * @param {object} props 拥有属性
      * @private {object} State
      * @return {返回一个混入了 ReactClass原型和 spec属性方法的强化 Constructor类}
+     * @return {为一个复合组件类，其中包含有自己的 props 和 state }
      */
     function Constructor(props) {
       this.props = props;

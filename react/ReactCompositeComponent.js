@@ -11,7 +11,10 @@ function ReactCompositeComponent(element) {
   this._instance = null;
 }
 
-// 首次装载
+/**
+ * 首次装载
+ * @param {*} rootID
+ */
 ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   this._rootNodeID = rootID;
 
@@ -20,7 +23,7 @@ ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   // this._currentElement.type 为 Constructor 构造函数类
   var ReactClass = this._currentElement.type;
 
-  // 实例化 一个 Constructor
+  // 实例化 一个 Constructor 复合组件 拥有自己的 props 和 state
   var inst = new ReactClass(publicProps);
 
   this._instance = inst;
@@ -52,18 +55,23 @@ ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   return renderedMarkup;
 };
 
-// 更新状态
+/**
+ * 更新
+ * @param {*} nextElement
+ * @param {*} newState
+ */
 ReactCompositeComponent.prototype.receiveComponent = function(
   nextElement,
   newState
 ) {
-  debugger
   this._currentElement = nextElement || this._currentElement;
 
-  // 
+  // 复合组件实例
+  // 内部有props 和 state
   var inst = this._instance;
 
   // 合并state
+  // 当 state 合并相同属性出现将会替换
   var nextState = $.extend(inst.state, newState);
   // 获取当前props
   var nextProps = this._currentElement.props;
@@ -84,6 +92,7 @@ ReactCompositeComponent.prototype.receiveComponent = function(
     inst.componentWillUpdate(nextProps, nextState);
   }
 
+  // 拿到子组件实例
   var prevComponentInstance = this._renderedComponent;
   var prevRenderedElement = prevComponentInstance._currentElement;
 
@@ -101,12 +110,15 @@ ReactCompositeComponent.prototype.receiveComponent = function(
     // 如果发现完全是不同的两种element，那就干脆重新渲染了
     var thisID = this._rootNodeID;
 
-    // 重新 new 一个对应的 component
-    this._renderedComponent = this._instantiateReactComponent(
+    var renderedComponentInstance = instantiateReactComponent(
       nextRenderedElement
     );
+
+    // 重新 new 一个对应的 component
+    this._renderedComponent = renderedComponentInstance;
+
     // 重新生成对应的元素内容
-    var nextMarkup = _renderedComponent.mountComponent(thisID);
+    var nextMarkup = renderedComponentInstance.mountComponent(thisID);
 
     // 替换整个节点
     $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);

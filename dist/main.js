@@ -10568,6 +10568,7 @@ const React = {
      * @param {object} props 拥有属性
      * @private {object} State
      * @return {返回一个混入了 ReactClass原型和 spec属性方法的强化 Constructor类}
+     * @return {为一个复合组件类，其中包含有自己的 props 和 state }
      */
     function Constructor(props) {
       this.props = props;
@@ -10608,7 +10609,7 @@ function ReactClass() {}
 ReactClass.prototype.render = function () {};
 
 ReactClass.prototype.setState = function (newState) {
-  // ReactCompositeComponent.prototype.mountComponent 装载时保存的当前实例
+  // 自定义组件 mountComponent 首次装载时保存 ReactCompositeComponent 实例
   this._reactInternalInstance.receiveComponent(null, newState);
 };
 
@@ -10630,7 +10631,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// 自定义组件
+// 自定义类型
 function ReactCompositeComponent(element) {
   this._currentElement = element;
   this._rootNodeID = null;
@@ -10646,7 +10647,7 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
   // this._currentElement.type 为 Constructor 构造函数类
   var ReactClass = this._currentElement.type;
 
-  // 实例化 一个 复合组件
+  // 实例化 一个 Constructor 复合组件 拥有自己的 props 和 state
   var inst = new ReactClass(publicProps);
 
   this._instance = inst;
@@ -10679,10 +10680,15 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
 // 更新状态
 ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
   debugger;
+
   this._currentElement = nextElement || this._currentElement;
+
+  // 复合组件实例
+  // 内部有props 和 state
   var inst = this._instance;
 
   // 合并state
+  // 当 state 合并相同属性出现将会替换
   var nextState = $.extend(inst.state, newState);
   // 获取当前props
   var nextProps = this._currentElement.props;
@@ -10700,6 +10706,7 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
     inst.componentWillUpdate(nextProps, nextState);
   }
 
+  // 拿到子组件实例
   var prevComponentInstance = this._renderedComponent;
   var prevRenderedElement = prevComponentInstance._currentElement;
 
@@ -10717,10 +10724,13 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
     // 如果发现完全是不同的两种element，那就干脆重新渲染了
     var thisID = this._rootNodeID;
 
+    var renderedComponentInstance = Object(_React__WEBPACK_IMPORTED_MODULE_1__["instantiateReactComponent"])(nextRenderedElement);
+
     // 重新 new 一个对应的 component
-    this._renderedComponent = this._instantiateReactComponent(nextRenderedElement);
+    this._renderedComponent = renderedComponentInstance;
+
     // 重新生成对应的元素内容
-    var nextMarkup = _renderedComponent.mountComponent(thisID);
+    var nextMarkup = renderedComponentInstance.mountComponent(thisID);
 
     // 替换整个节点
     $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
@@ -10744,7 +10754,7 @@ __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
 
 
-// ReactDOMComponent 类型
+// ReactDOMComponent
 function ReactDOMComponent(element) {
   this._currentElement = element;
   this._rootNodeID = null;
@@ -10817,7 +10827,7 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-// React 文本类型
+// React 文本
 function ReactDOMTextComponent(text) {
   this._currentElement = "" + text;
   this._rootId = null;
