@@ -5,8 +5,27 @@ import ReactDOMTextComponent from "./ReactDOMTextComponent";
 import ReactDOMComponent from "./ReactDOMComponent";
 import ReactCompositeComponent from "./ReactCompositeComponent";
 
+//用来判定两个element需不需要更新
+//这里的key是我们createElement的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
+export function _shouldUpdateReactComponent(prevElement, nextElement) {
+  if (prevElement != null && nextElement != null) {
+    var prevType = typeof prevElement;
+    var nextType = typeof nextElement;
+    if (prevType === "string" || prevType === "number") {
+      return nextType === "string" || nextType === "number";
+    } else {
+      return (
+        nextType === "object" &&
+        prevElement.type === nextElement.type &&
+        prevElement.key === nextElement.key
+      );
+    }
+  }
+  return false;
+}
+
 // 实例化
-function instantiateReactComponent(node) {
+export function instantiateReactComponent(node) {
   if (typeof node === "string" || typeof node === "number") {
     // 文本类型
     return new ReactDOMTextComponent(node);
@@ -14,6 +33,7 @@ function instantiateReactComponent(node) {
     // ReactDOMComponent
     return new ReactDOMComponent(node);
   } else if (typeof node === "object" && typeof node.type === "function") {
+    // node.type 是否为一个 Constructor 构造函数类
     // 自定义组件
     return new ReactCompositeComponent(node);
   }
@@ -44,7 +64,7 @@ const React = {
       props.children = Array.isArray(props.children)
         ? props.children
         : [props.children];
-    } else if (childrenLength.length > 1) {
+    } else if (childrenLength > 1) {
       var childArray = Array(childrenLength);
       for (var i = 0; i < childrenLength; ++i) {
         childArray[i] = arguments[i + 2];
@@ -67,6 +87,14 @@ const React = {
   },
 
   createClass: function(spec) {
+    /**
+     * Constructor 类
+     * Constructor 持有 ReactClass 的 prototype 饮用
+     * Constructor 最终混入 传入的各种属性和方法
+     * @param {object} props 拥有属性
+     * @private {object} State
+     * @return {返回一个混入了 ReactClass原型和 spec属性方法的强化 Constructor类}
+     */
     function Constructor(props) {
       this.props = props;
       this.state = this.getInitialState ? this.getInitialState() : null;

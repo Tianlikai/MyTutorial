@@ -1,11 +1,13 @@
+import { instantiateReactComponent } from "./React";
+
 // ReactDOMComponent 类型
 function ReactDOMComponent(element) {
   this._currentElement = element;
-  this._rootId = null;
+  this._rootNodeID = null;
 }
 
 ReactDOMComponent.prototype.mountComponent = function(rootID) {
-  this._rootID = rootID;
+  this._rootNodeID = rootID;
   var props = this._currentElement.props;
   var tagOpen = "<" + this._currentElement.type;
   var tagClose = "</" + this._currentElement.type + ">";
@@ -13,8 +15,9 @@ ReactDOMComponent.prototype.mountComponent = function(rootID) {
 
   for (var propKey in props) {
     if (/^on[A-Za-z]/.test(propKey)) {
-      // 这里要做一下事件的监听，就是从属性props里面解析拿出on开头的事件属性的对应事件监听
-      var eventType = props.propKey.replace("on", "");
+      // 这里要做一下事件的监听，就是从属性 props 里面解析拿出 on 开头的事件属性的对应事件监听
+      var eventType = propKey.replace("on", "");
+      // 将事件委托到 data-reactid = this._rootNodeID 上
       $(document).delegate(
         '[data-reactid="' + this._rootNodeID + '"]',
         eventType + "." + this._rootNodeID,
@@ -33,21 +36,24 @@ ReactDOMComponent.prototype.mountComponent = function(rootID) {
     }
   }
 
+  // 记录所有 children 中生成的 html
   var content = "";
+
   var children = props.children || [];
-  // 用于保存所有的子节点的 componet实例，以后会用到
+  // 用于保存所有的子节点的 component 实例，以后会用到
   var childrenInstances = [];
   var that = this;
   $.each(children, function(key, child) {
-    // 这里再次调用了instantiateReactComponent实例化子节点component类，拼接好返回
+    // 这里再次调用了 instantiateReactComponent 实例化子节点 component 类，拼接好返回
+    // children 为 React.createElement(type, props, children) 中的所有 children 数组
     var childComponentInstance = instantiateReactComponent(child);
     childComponentInstance._mountIndex = key;
 
     childrenInstances.push(childComponentInstance);
-    // 子节点的rootId是父节点的rootId加上新的key也就是顺序的值拼成的新值
+
+    // 子节点的 rootId 是父节点的 rootId 加上新的 key 也就是顺序的值拼成的新值
     var curRootId = that._rootNodeID + "." + key;
     // 得到子节点的渲染内容
-    // 递归
     var childMarkup = childComponentInstance.mountComponent(curRootId);
     // 拼接在一起
     content += " " + childMarkup;

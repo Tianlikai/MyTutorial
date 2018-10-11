@@ -10466,32 +10466,52 @@ return jQuery;
 /*!************************!*\
   !*** ./react/React.js ***!
   \************************/
-/*! exports provided: default */
+/*! exports provided: _shouldUpdateReactComponent, instantiateReactComponent, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactElement */ "./react/ReactElement.js");
-/* harmony import */ var _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactDOMTextComponent */ "./react/ReactDOMTextComponent.js");
-/* harmony import */ var _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactDOMComponent */ "./react/ReactDOMComponent.js");
-/* harmony import */ var _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ReactCompositeComponent */ "./react/ReactCompositeComponent.js");
-/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
+/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_shouldUpdateReactComponent", function() { return _shouldUpdateReactComponent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "instantiateReactComponent", function() { return instantiateReactComponent; });
+/* harmony import */ var _ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactElement */ "./react/ReactElement.js");
+/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
+/* harmony import */ var _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactDOMTextComponent */ "./react/ReactDOMTextComponent.js");
+/* harmony import */ var _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ReactDOMComponent */ "./react/ReactDOMComponent.js");
+/* harmony import */ var _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ReactCompositeComponent */ "./react/ReactCompositeComponent.js");
 
 
 
 
 
+
+
+//用来判定两个element需不需要更新
+//这里的key是我们createElement的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
+function _shouldUpdateReactComponent(prevElement, nextElement) {
+  if (prevElement != null && nextElement != null) {
+    var prevType = typeof prevElement;
+    var nextType = typeof nextElement;
+    if (prevType === "string" || prevType === "number") {
+      return nextType === "string" || nextType === "number";
+    } else {
+      return nextType === "object" && prevElement.type === nextElement.type && prevElement.key === nextElement.key;
+    }
+  }
+  return false;
+}
 
 // 实例化
 function instantiateReactComponent(node) {
   if (typeof node === "string" || typeof node === "number") {
     // 文本类型
-    return new _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1__["default"](node);
+    return new _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2__["default"](node);
   } else if (typeof node === "object" && typeof node.type === "string") {
     // ReactDOMComponent
-    return new _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_2__["default"](node);
+    return new _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_3__["default"](node);
   } else if (typeof node === "object" && typeof node.type === "function") {
-    return new _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_3__["default"](node);
+    // node.type 是否为一个 Constructor 构造函数类
+    // 自定义组件
+    return new _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_4__["default"](node);
   }
 }
 
@@ -10518,7 +10538,7 @@ const React = {
     var childrenLength = arguments.length - 2;
     if (childrenLength === 1) {
       props.children = Array.isArray(props.children) ? props.children : [props.children];
-    } else if (childrenLength.length > 1) {
+    } else if (childrenLength > 1) {
       var childArray = Array(childrenLength);
       for (var i = 0; i < childrenLength; ++i) {
         childArray[i] = arguments[i + 2];
@@ -10541,11 +10561,19 @@ const React = {
   },
 
   createClass: function (spec) {
+    /**
+     * Constructor 类
+     * Constructor 持有 ReactClass 的 prototype 饮用
+     * Constructor 最终混入 传入的各种属性和方法
+     * @param {object} props 拥有属性
+     * @private {object} State
+     * @return {返回一个混入了 ReactClass原型和 spec属性方法的强化 Constructor类}
+     */
     function Constructor(props) {
       this.props = props;
       this.state = this.getInitialState ? this.getInitialState() : null;
     }
-    Constructor.prototype = new _ReactClass__WEBPACK_IMPORTED_MODULE_4__["default"]();
+    Constructor.prototype = new _ReactClass__WEBPACK_IMPORTED_MODULE_1__["default"]();
     Constructor.prototype.constructor = Constructor;
 
     // 混入 spec 的原型
@@ -10579,6 +10607,10 @@ function ReactClass() {}
 
 ReactClass.prototype.render = function () {};
 
+ReactClass.prototype.setState = function (newState) {
+  this._reactInternalInstance.receiveComponent(null, newState);
+};
+
 /* harmony default export */ __webpack_exports__["default"] = (ReactClass);
 
 /***/ }),
@@ -10593,19 +10625,28 @@ ReactClass.prototype.render = function () {};
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
+/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./React */ "./react/React.js");
 
 
+
+// 自定义组件
 function ReactCompositeComponent(element) {
   this._currentElement = element;
   this._rootNodeID = null;
   this._instance = null;
 }
+
 ReactCompositeComponent.prototype.mountComponent = function (rootID) {
   this._rootNodeID = rootID;
+
   var publicProps = this._currentElement.props;
+
+  // this._currentElement.type 为 Constructor 构造函数类
   var ReactClass = this._currentElement.type;
 
+  // 实例化 一个 复合组件
   var inst = new ReactClass(publicProps);
+
   this._instance = inst;
   inst._reactInternalInstance = this;
 
@@ -10613,18 +10654,71 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
     inst.componentWillMount();
   }
 
+  // 复合组件的 render() 方法
+  // 返回一个需要渲染的元素 类型不确定
   var renderedElement = this._instance.render();
-  var renderedComponentInstance = instantiateReactComponent(renderedElement);
+  // 实例化子组件实例
+  var renderedComponentInstance = Object(_React__WEBPACK_IMPORTED_MODULE_1__["instantiateReactComponent"])(renderedElement);
+  // 缓存子组件实例
   this._renderedComponent = renderedComponentInstance;
+  // 装载子组件
   var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
 
-  //之前我们在React.render方法最后触发了mountReady事件，所以这里可以监听，在渲染完成后会触发。
+  //之前我们在React.render 方法最后触发了 mountReady事件，所以这里可以监听，在渲染完成后会触发。
   $(document).on("mountReady", function () {
-    //调用inst.componentDidMount
+    // 当子组件的 componentDidMount() 方法调用完后 调用父组件的 componentDidMount() 方法
+    // 调用inst.componentDidMount
     inst.componentDidMount && inst.componentDidMount();
   });
 
   return renderedMarkup;
+};
+
+ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
+  this._currentElement = nextElement || this._currentElement;
+  var inst = this._instance;
+
+  // 合并state
+  var nextState = $.extend(inst.state, newState);
+  // 获取当前props
+  var nextProps = this._currentElement.props;
+
+  // 改写state
+  inst.state = nextState;
+
+  // 如果inst有shouldComponentUpdate并且返回false。说明组件本身判断不要更新，就直接返回。
+  if (inst.shouldComponentUpdate && inst.shouldComponentUpdate(nextProps, nextState) === false) {
+    return null;
+  }
+
+  // 有生命周期componentWillUpdate
+  if (inst.componentWillUpdate) {
+    inst.componentWillUpdate(nextProps, nextState);
+  }
+
+  var prevComponentInstance = this._renderedComponent;
+  var prevRenderedElement = prevComponentInstance._currentElement;
+
+  // 拿到新的 element
+  var nextRenderedElement = this._instance.render();
+
+  // _shouldUpdateReactComponent 全局方法
+  // 判断是需要更新还是直接就重新渲染
+  if (Object(_React__WEBPACK_IMPORTED_MODULE_1__["_shouldUpdateReactComponent"])(prevRenderedElement, nextRenderedElement)) {
+    // 如果需要更新，就继续调用子节点的receiveComponent的方法，传入新的element更新子节点。
+    prevComponentInstance.receiveComponent(nextRenderedElement);
+    // 调用componentDidUpdate表示更新完成了
+    inst.componentDidUpdate && inst.componentDidUpdate();
+  } else {
+    // 如果发现完全是不同的两种element，那就干脆重新渲染了
+    var thisID = this._rootNodeID;
+    // 重新new一个对应的component，
+    this._renderedComponent = this._instantiateReactComponent(nextRenderedElement);
+    // 重新生成对应的元素内容
+    var nextMarkup = _renderedComponent.mountComponent(thisID);
+    // 替换整个节点
+    $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
+  }
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactCompositeComponent);
@@ -10641,13 +10735,17 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {// ReactDOMComponent 类型
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
+
+
+// ReactDOMComponent 类型
 function ReactDOMComponent(element) {
   this._currentElement = element;
-  this._rootId = null;
+  this._rootNodeID = null;
 }
+
 ReactDOMComponent.prototype.mountComponent = function (rootID) {
-  this._rootID = rootID;
+  this._rootNodeID = rootID;
   var props = this._currentElement.props;
   var tagOpen = "<" + this._currentElement.type;
   var tagClose = "</" + this._currentElement.type + ">";
@@ -10655,8 +10753,9 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
 
   for (var propKey in props) {
     if (/^on[A-Za-z]/.test(propKey)) {
-      // 这里要做一下事件的监听，就是从属性props里面解析拿出on开头的事件属性的对应事件监听
-      var eventType = props.propKey.replace("on", "");
+      // 这里要做一下事件的监听，就是从属性 props 里面解析拿出 on 开头的事件属性的对应事件监听
+      var eventType = propKey.replace("on", "");
+      // 将事件委托到 data-reactid = this._rootNodeID 上
       $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + "." + this._rootNodeID, props[propKey]);
     }
 
@@ -10667,21 +10766,24 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
     }
   }
 
+  // 记录所有 children 中生成的 html
   var content = "";
+
   var children = props.children || [];
-  // 用于保存所有的子节点的 componet实例，以后会用到
+  // 用于保存所有的子节点的 component 实例，以后会用到
   var childrenInstances = [];
   var that = this;
   $.each(children, function (key, child) {
-    // 这里再次调用了instantiateReactComponent实例化子节点component类，拼接好返回
-    var childComponentInstance = instantiateReactComponent(child);
+    // 这里再次调用了 instantiateReactComponent 实例化子节点 component 类，拼接好返回
+    // children 为 React.createElement(type, props, children) 中的所有 children 数组
+    var childComponentInstance = Object(_React__WEBPACK_IMPORTED_MODULE_0__["instantiateReactComponent"])(child);
     childComponentInstance._mountIndex = key;
 
     childrenInstances.push(childComponentInstance);
-    // 子节点的rootId是父节点的rootId加上新的key也就是顺序的值拼成的新值
+
+    // 子节点的 rootId 是父节点的 rootId 加上新的 key 也就是顺序的值拼成的新值
     var curRootId = that._rootNodeID + "." + key;
     // 得到子节点的渲染内容
-    // 递归
     var childMarkup = childComponentInstance.mountComponent(curRootId);
     // 拼接在一起
     content += " " + childMarkup;
@@ -10734,10 +10836,10 @@ ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReactElement; });
 // 虚拟dom模型
-function ReactElement(type, props, keys) {
-    this.type = type;
-    this.props = props;
-    this.keys = keys;
+function ReactElement(type, props, key) {
+  this.type = type;
+  this.props = props;
+  this.key = key;
 }
 
 /***/ }),
@@ -10754,7 +10856,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
 
 
-_React__WEBPACK_IMPORTED_MODULE_0__["default"].render("hello world", document.getElementById("root"));
+// React.render("hello world", document.getElementById("root"));
+
+var HelloMessage = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createClass({
+  getInitialState: function () {
+    return {
+      type: "say "
+    };
+  },
+  changeType: function () {
+    this.setState({
+      type: "running"
+    });
+  },
+  render: function () {
+    return _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", {
+      onclick: this.changeType
+    }, this.state.type, "Hello", this.props.name);
+  }
+});
+
+const entry = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(HelloMessage, { key: "entry", name: "John" });
+const root = document.getElementById("root");
+_React__WEBPACK_IMPORTED_MODULE_0__["default"].render(entry, root);
 
 /***/ })
 
