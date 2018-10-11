@@ -10462,31 +10462,186 @@ return jQuery;
 
 /***/ }),
 
-/***/ "./react/index.js":
+/***/ "./react/React.js":
 /*!************************!*\
-  !*** ./react/index.js ***!
+  !*** ./react/React.js ***!
   \************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function($) {// 虚拟dom模型
-function ReactElement(type, props, keys) {
-  this.type = type;
-  this.props = props;
-  this.keys = keys;
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactElement */ "./react/ReactElement.js");
+/* harmony import */ var _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactDOMTextComponent */ "./react/ReactDOMTextComponent.js");
+/* harmony import */ var _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactDOMComponent */ "./react/ReactDOMComponent.js");
+/* harmony import */ var _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ReactCompositeComponent */ "./react/ReactCompositeComponent.js");
+/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
+
+
+
+
+
+
+// 实例化
+function instantiateReactComponent(node) {
+  if (typeof node === "string" || typeof node === "number") {
+    // 文本类型
+    return new _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_1__["default"](node);
+  } else if (typeof node === "object" && typeof node.type === "string") {
+    // ReactDOMComponent
+    return new _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_2__["default"](node);
+  } else if (typeof node === "object" && typeof node.type === "function") {
+    return new _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_3__["default"](node);
+  }
 }
 
-// React 文本类型
-function ReactDOMTextComponent(text) {
-  this._currentElement = "" + text;
-  this._rootId = null;
-}
-ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
-  this._rootId = rootID;
-  return '<span data-reactid="' + rootID + '">' + this._currentElement + "</span>";
+// React对象
+const React = {
+  nextReactRootIndex: 0,
+
+  createElement: function (type, config, children) {
+    var propsName,
+        props = {},
+        config = config || {},
+        key = null;
+
+    if (config != null) {
+      key = config.key === undefined ? null : "" + config.key;
+      for (propsName in config) {
+        // config.hasOwnProperty 是否为对象自身拥有该属性，而不是原型上的
+        if (propsName !== "key" && config.hasOwnProperty(propsName)) {
+          props[propsName] = config[propsName];
+        }
+      }
+    }
+
+    var childrenLength = arguments.length - 2;
+    if (childrenLength === 1) {
+      props.children = Array.isArray(props.children) ? props.children : [props.children];
+    } else if (childrenLength.length > 1) {
+      var childArray = Array(childrenLength);
+      for (var i = 0; i < childrenLength; ++i) {
+        childArray[i] = arguments[i + 2];
+      }
+      props.children = childArray;
+    }
+
+    if (type && type.defaultProps) {
+      var defaultProps = type.defaultProps;
+      for (propsName in defaultProps) {
+        if (typeof props[propsName] === "undefined") {
+          // 如果某个属性为空，则取默认属性
+          props[propsName] = defaultProps[propsName];
+        }
+      }
+    }
+
+    // 返回一个ReactElement实例对象
+    return new _ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"](type, props, key);
+  },
+
+  createClass: function (spec) {
+    function Constructor(props) {
+      this.props = props;
+      this.state = this.getInitialState ? this.getInitialState() : null;
+    }
+    Constructor.prototype = new _ReactClass__WEBPACK_IMPORTED_MODULE_4__["default"]();
+    Constructor.prototype.constructor = Constructor;
+
+    // 混入 spec 的原型
+    $.extend(Constructor.prototype, spec);
+    return Constructor;
+  },
+
+  render: function (element, container) {
+    var componentInstance = instantiateReactComponent(element);
+    var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
+    $(container).html(markup);
+    $(document).trigger("mountReady");
+  }
 };
 
-// ReactDOMComponent 类型
+/* harmony default export */ __webpack_exports__["default"] = (React);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
+
+/***/ }),
+
+/***/ "./react/ReactClass.js":
+/*!*****************************!*\
+  !*** ./react/ReactClass.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function ReactClass() {}
+
+ReactClass.prototype.render = function () {};
+
+/* harmony default export */ __webpack_exports__["default"] = (ReactClass);
+
+/***/ }),
+
+/***/ "./react/ReactCompositeComponent.js":
+/*!******************************************!*\
+  !*** ./react/ReactCompositeComponent.js ***!
+  \******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
+
+
+function ReactCompositeComponent(element) {
+  this._currentElement = element;
+  this._rootNodeID = null;
+  this._instance = null;
+}
+ReactCompositeComponent.prototype.mountComponent = function (rootID) {
+  this._rootNodeID = rootID;
+  var publicProps = this._currentElement.props;
+  var ReactClass = this._currentElement.type;
+
+  var inst = new ReactClass(publicProps);
+  this._instance = inst;
+  inst._reactInternalInstance = this;
+
+  if (inst.componentWillMount) {
+    inst.componentWillMount();
+  }
+
+  var renderedElement = this._instance.render();
+  var renderedComponentInstance = instantiateReactComponent(renderedElement);
+  this._renderedComponent = renderedComponentInstance;
+  var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
+
+  //之前我们在React.render方法最后触发了mountReady事件，所以这里可以监听，在渲染完成后会触发。
+  $(document).on("mountReady", function () {
+    //调用inst.componentDidMount
+    inst.componentDidMount && inst.componentDidMount();
+  });
+
+  return renderedMarkup;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (ReactCompositeComponent);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
+
+/***/ }),
+
+/***/ "./react/ReactDOMComponent.js":
+/*!************************************!*\
+  !*** ./react/ReactDOMComponent.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {// ReactDOMComponent 类型
 function ReactDOMComponent(element) {
   this._currentElement = element;
   this._rootId = null;
@@ -10539,123 +10694,67 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
   return tagOpen + ">" + content + tagClose;
 };
 
-function ReactCompositeComponent(element) {
-  this._currentElement = element;
-  this._rootNodeID = null;
-  this._instance = null;
-}
-ReactCompositeComponent.prototype.mountComponent = function (rootID) {
-  this._rootNodeID = rootID;
-  var publicProps = this._currentElement.props;
-  var ReactClass = this._currentElement.type;
-
-  var inst = new ReactClass(publicProps);
-  this._instance = inst;
-  inst._reactInternalInstance = this;
-
-  if (inst.componentWillMount) {
-    inst.componentWillMount();
-  }
-
-  var renderedElement = this._instance.render();
-  var renderedComponentInstance = instantiateReactComponent(renderedElement);
-  this._renderedComponent = renderedComponentInstance;
-  var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
-
-  //之前我们在React.render方法最后触发了mountReady事件，所以这里可以监听，在渲染完成后会触发。
-  $(document).on("mountReady", function () {
-    //调用inst.componentDidMount
-    inst.componentDidMount && inst.componentDidMount();
-  });
-
-  return renderedMarkup;
-};
-
-function ReactClass() {}
-
-ReactClass.prototype.render = function () {};
-
-// 实例化
-function instantiateReactComponent(node) {
-  if (typeof node === "string" || typeof node === "number") {
-    // 文本类型
-    return new ReactDOMTextComponent(node);
-  } else if (typeof node === "object" && typeof node.type === "string") {
-    // ReactDOMComponent
-    return new ReactDOMComponent(node);
-  } else if (typeof node === "object" && typeof node.type === "function") {
-    return new ReactCompositeComponent(node);
-  }
-}
-
-// React对象
-const React = {
-  nextReactRootIndex: 0,
-
-  createElement: function (type, config, children) {
-    var propsName,
-        props = {},
-        config = config || {},
-        key = null;
-
-    if (config != null) {
-      key = config.key === undefined ? null : "" + config.key;
-      for (propsName in config) {
-        // config.hasOwnProperty 是否为对象自身拥有该属性，而不是原型上的
-        if (propsName !== "key" && config.hasOwnProperty(propsName)) {
-          props[propsName] = config[propsName];
-        }
-      }
-    }
-
-    var childrenLength = arguments.length - 2;
-    if (childrenLength === 1) {
-      props.children = Array.isArray(props.children) ? props.children : [props.children];
-    } else if (childrenLength.length > 1) {
-      var childArray = Array(childrenLength);
-      for (var i = 0; i < childrenLength; ++i) {
-        childArray[i] = arguments[i + 2];
-      }
-      props.children = childArray;
-    }
-
-    if (type && type.defaultProps) {
-      var defaultProps = type.defaultProps;
-      for (propsName in defaultProps) {
-        if (typeof props[propsName] === "undefined") {
-          // 如果某个属性为空，则取默认属性
-          props[propsName] = defaultProps[propsName];
-        }
-      }
-    }
-
-    // 返回一个ReactElement实例对象
-    return new ReactElement(type, props, key);
-  },
-
-  createClass: function (spec) {
-    function Constructor(props) {
-      this.props = props;
-      this.state = this.getInitialState ? this.getInitialState() : null;
-    }
-    Constructor.prototype = new ReactClass();
-    Constructor.prototype.constructor = Constructor;
-
-    // 混入 spec 的原型
-    $.extend(Constructor.prototype, spec);
-    return Constructor;
-  },
-
-  render: function (element, container) {
-    var componentInstance = instantiateReactComponent(element);
-    var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
-    $(container).html(markup);
-    $(document).trigger("mountReady");
-  }
-};
-
-React.render("hello world", document.getElementById("root"));
+/* harmony default export */ __webpack_exports__["default"] = (ReactDOMComponent);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
+
+/***/ }),
+
+/***/ "./react/ReactDOMTextComponent.js":
+/*!****************************************!*\
+  !*** ./react/ReactDOMTextComponent.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// React 文本类型
+function ReactDOMTextComponent(text) {
+  this._currentElement = "" + text;
+  this._rootId = null;
+}
+
+ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
+  this._rootId = rootID;
+  return '<span data-reactid="' + rootID + '">' + this._currentElement + "</span>";
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (ReactDOMTextComponent);
+
+/***/ }),
+
+/***/ "./react/ReactElement.js":
+/*!*******************************!*\
+  !*** ./react/ReactElement.js ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReactElement; });
+// 虚拟dom模型
+function ReactElement(type, props, keys) {
+    this.type = type;
+    this.props = props;
+    this.keys = keys;
+}
+
+/***/ }),
+
+/***/ "./react/index.js":
+/*!************************!*\
+  !*** ./react/index.js ***!
+  \************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
+
+
+_React__WEBPACK_IMPORTED_MODULE_0__["default"].render("hello world", document.getElementById("root"));
 
 /***/ })
 
