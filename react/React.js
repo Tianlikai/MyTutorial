@@ -1,8 +1,9 @@
 import ReactElement from "./ReactElement";
+import ReactClass from "./ReactClass";
+
 import ReactDOMTextComponent from "./ReactDOMTextComponent";
 import ReactDOMComponent from "./ReactDOMComponent";
 import ReactCompositeComponent from "./ReactCompositeComponent";
-import ReactClass from "./ReactClass";
 
 // 实例化
 function instantiateReactComponent(node) {
@@ -13,6 +14,7 @@ function instantiateReactComponent(node) {
     // ReactDOMComponent
     return new ReactDOMComponent(node);
   } else if (typeof node === "object" && typeof node.type === "function") {
+    // 自定义组件
     return new ReactCompositeComponent(node);
   }
 }

@@ -1,12 +1,15 @@
 import ReactClass from "./ReactClass";
 
+// 自定义组件
 function ReactCompositeComponent(element) {
   this._currentElement = element;
   this._rootNodeID = null;
   this._instance = null;
 }
+
 ReactCompositeComponent.prototype.mountComponent = function(rootID) {
   this._rootNodeID = rootID;
+
   var publicProps = this._currentElement.props;
   var ReactClass = this._currentElement.type;
 
@@ -25,7 +28,7 @@ ReactCompositeComponent.prototype.mountComponent = function(rootID) {
     this._rootNodeID
   );
 
-  //之前我们在React.render方法最后触发了mountReady事件，所以这里可以监听，在渲染完成后会触发。
+  //之前我们在React.render 方法最后触发了 mountReady事件，所以这里可以监听，在渲染完成后会触发。
   $(document).on("mountReady", function() {
     //调用inst.componentDidMount
     inst.componentDidMount && inst.componentDidMount();

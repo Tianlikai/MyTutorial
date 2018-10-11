@@ -3,6 +3,7 @@ function ReactDOMComponent(element) {
   this._currentElement = element;
   this._rootId = null;
 }
+
 ReactDOMComponent.prototype.mountComponent = function(rootID) {
   this._rootID = rootID;
   var props = this._currentElement.props;
