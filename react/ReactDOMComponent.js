@@ -1,9 +1,69 @@
-import { instantiateReactComponent } from "./React";
+import {
+  instantiateReactComponent,
+  _shouldUpdateReactComponent
+} from "./React";
 
 // 全局更新深度标识
 var updateDepth = 0;
 // 全局更新队列，保存所有差异
 var diffQueue = [];
+
+// diff 更新类型
+var UPDATE_TYPE = {
+  MOVE_EXISTING: 1,
+  REMOVE_NODE: 2,
+  INSERT_MARKUP: 3
+};
+
+/**
+ * 将数组children 改为map
+ * map 的 key 就是 element 的key
+ * 如果为 text 元素 或者没有 key 值，则key为数组下标
+ * @param {array} componentChildren
+ * @return {object}
+ */
+function flattenChildren(componentChildren) {
+  var name;
+  var childrenMap = {};
+  componentChildren.forEach((child, i) => {
+    name =
+      child._currentElement && child._currentElement.key
+        ? child._currentElement.key
+        : i.toString(32);
+    childrenMap[name] = child;
+  });
+  return childrenMap;
+}
+
+/**
+ * 生成一个子节点elements map
+ * @param {*} prevChildren
+ * @param {*} nextChildrenElements
+ * @return {object}
+ */
+function generateComponentChildren(prevChildren, nextChildrenElements) {
+  var nextChildren = {};
+  var nextChildrenElements = nextChildrenElements || [];
+
+  $.each(nextChildrenElements, function(i, element) {
+    var name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           n                                      jjjnm= element.key ? element.key : i;
+    var prevChild = prevChildren && prevChildren[name];
+    var prevElement = prevChild._currentElement;
+    var nextElement = element;
+
+    if (_shouldUpdateReactComponent(prevElement, nextElement)) {
+      // 对与需要更新的节点直接调用 receiveComponent
+      prevChild.receiveComponent(prevElement);
+      nextChildren[name] = prevChild;
+    } else {
+      // 对于新增的节点，生成一个新的component
+      var nextChildInstance = instantiateReactComponent(nextElement);
+      nextChildren[name] = nextChildInstance;
+    }
+  });
+
+  return nextChildren;
+}
 
 // ReactDOMComponent
 function ReactDOMComponent(element) {
@@ -180,6 +240,14 @@ ReactDOMComponent.prototype._updateDOMChildren = function(
     this._patch(diffQueue);
     diffQueue = [];
   }
+};
+
+ReactDOMComponent.prototype._diff = function(diffQueue, nextChildrenElements) {
+  // 使用相同的component，所以执行移动操作
+  // 不相同，说明是新增加的节点
+  // 如果老的存在，就是element不同，但是component一样，我们需要把老的element删除
+  //如果以前已经渲染过了，记得先去掉以前所有的事件监听，通过命名空间全部清空
+  //对于老的节点里有，新的节点里没有的那些，也全都删除掉
 };
 
 export default ReactDOMComponent;
