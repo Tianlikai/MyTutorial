@@ -61,9 +61,7 @@ const React = {
 
     var childrenLength = arguments.length - 2;
     if (childrenLength === 1) {
-      props.children = Array.isArray(props.children)
-        ? props.children
-        : [props.children];
+      props.children = Array.isArray(children) ? children : [children];
     } else if (childrenLength > 1) {
       var childArray = Array(childrenLength);
       for (var i = 0; i < childrenLength; ++i) {

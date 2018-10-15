@@ -10462,32 +10462,492 @@ return jQuery;
 
 /***/ }),
 
-/***/ "./react/React.js":
+/***/ "./react/index.js":
 /*!************************!*\
-  !*** ./react/React.js ***!
+  !*** ./react/index.js ***!
   \************************/
-/*! exports provided: _shouldUpdateReactComponent, instantiateReactComponent, default */
+/*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_shouldUpdateReactComponent", function() { return _shouldUpdateReactComponent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "instantiateReactComponent", function() { return instantiateReactComponent; });
-/* harmony import */ var _ReactElement__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactElement */ "./react/ReactElement.js");
-/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
-/* harmony import */ var _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReactDOMTextComponent */ "./react/ReactDOMTextComponent.js");
-/* harmony import */ var _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ReactDOMComponent */ "./react/ReactDOMComponent.js");
-/* harmony import */ var _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ReactCompositeComponent */ "./react/ReactCompositeComponent.js");
+/* harmony import */ var _main_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main.js */ "./react/main.js");
 
 
+var TodoList = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createClass({
+  getInitialState: function () {
+    return { items: [] };
+  },
+  add: function () {
+    var nextItems = this.state.items.concat([this.state.text]);
+    this.setState({ items: nextItems, text: "" });
+  },
+  onChange: function (e) {
+    this.setState({ text: e.target.value });
+  },
+  render: function () {
+    var createItem = function (itemText) {
+      return _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, itemText);
+    };
 
+    var lists = this.state.items.map(createItem);
+    var input = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("input", {
+      onkeyup: this.onChange.bind(this),
+      value: this.state.text
+    });
+    var button = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", { onclick: this.add.bind(this) }, "Add#" + (this.state.items.length + 1));
+    var children = [input, button].concat(lists);
 
+    return _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, children);
+  }
+});
 
+_main_js__WEBPACK_IMPORTED_MODULE_0__["default"].render(_main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(TodoList), document.getElementById("container"));
 
+/***/ }),
 
-// 用来判定两个element需不需要更新
-// 这里的 key 是我们 createElement 的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
-function _shouldUpdateReactComponent(prevElement, nextElement) {
+/***/ "./react/main.js":
+/*!***********************!*\
+  !*** ./react/main.js ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {//component类，用来表示文本在渲染，更新，删除时应该做些什么事情
+function ReactDOMTextComponent(text) {
+  //存下当前的字符串
+  this._currentElement = "" + text;
+  //用来标识当前component
+  this._rootNodeID = null;
+}
+
+//component渲染时生成的dom结构
+ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
+  this._rootNodeID = rootID;
+  return '<span data-reactid="' + rootID + '">' + this._currentElement + "</span>";
+};
+
+ReactDOMTextComponent.prototype.receiveComponent = function (nextText) {
+  var nextStringText = "" + nextText;
+  //跟以前保存的字符串比较
+  if (nextStringText !== this._currentElement) {
+    this._currentElement = nextStringText;
+    //替换整个节点
+    $('[data-reactid="' + this._rootNodeID + '"]').html(this._currentElement);
+  }
+};
+
+//component类，用来表示文本在渲染，更新，删除时应该做些什么事情
+function ReactDOMComponent(element) {
+  //存下当前的element对象引用
+  this._currentElement = element;
+  this._rootNodeID = null;
+}
+
+//component渲染时生成的dom结构
+ReactDOMComponent.prototype.mountComponent = function (rootID) {
+  //赋值标识
+  this._rootNodeID = rootID;
+  var props = this._currentElement.props;
+  var tagOpen = "<" + this._currentElement.type;
+  var tagClose = "</" + this._currentElement.type + ">";
+
+  //加上reactid标识
+  tagOpen += " data-reactid=" + this._rootNodeID;
+
+  //拼凑出属性
+  for (var propKey in props) {
+    //这里要做一下事件的监听，就是从属性props里面解析拿出on开头的事件属性的对应事件监听
+    if (/^on[A-Za-z]/.test(propKey)) {
+      var eventType = propKey.replace("on", "");
+      //针对当前的节点添加事件代理,以_rootNodeID为命名空间
+      $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + "." + this._rootNodeID, props[propKey]);
+    }
+
+    //对于children属性以及事件监听的属性不需要进行字符串拼接
+    //事件会代理到全局。这边不能拼到dom上不然会产生原生的事件监听
+    if (props[propKey] && propKey != "children" && !/^on[A-Za-z]/.test(propKey)) {
+      tagOpen += " " + propKey + "=" + props[propKey];
+    }
+  }
+  //获取子节点渲染出的内容
+  var content = "";
+  var children = props.children || [];
+
+  var childrenInstances = []; //用于保存所有的子节点的componet实例，以后会用到
+  var that = this;
+  $.each(children, function (key, child) {
+    //这里再次调用了instantiateReactComponent实例化子节点component类，拼接好返回
+    var childComponentInstance = instantiateReactComponent(child);
+    childComponentInstance._mountIndex = key;
+
+    childrenInstances.push(childComponentInstance);
+    //子节点的rootId是父节点的rootId加上新的key也就是顺序的值拼成的新值
+    var curRootId = that._rootNodeID + "." + key;
+    //得到子节点的渲染内容
+    var childMarkup = childComponentInstance.mountComponent(curRootId);
+    //拼接在一起
+    content += " " + childMarkup;
+  });
+
+  //留给以后更新时用的这边先不用管
+  this._renderedChildren = childrenInstances;
+
+  //拼出整个html内容
+  return tagOpen + ">" + content + tagClose;
+};
+
+ReactDOMComponent.prototype.receiveComponent = function (nextElement) {
+  var lastProps = this._currentElement.props;
+  var nextProps = nextElement.props;
+
+  this._currentElement = nextElement;
+  //需要单独的更新属性
+  this._updateDOMProperties(lastProps, nextProps);
+  //再更新子节点
+  this._updateDOMChildren(nextElement.props.children);
+};
+
+ReactDOMComponent.prototype._updateDOMProperties = function (lastProps, nextProps) {
+  var propKey;
+  //遍历，当一个老的属性不在新的属性集合里时，需要删除掉。
+
+  for (propKey in lastProps) {
+    //新的属性里有，或者propKey是在原型上的直接跳过。这样剩下的都是不在新属性集合里的。需要删除
+    if (nextProps.hasOwnProperty(propKey) || !lastProps.hasOwnProperty(propKey)) {
+      continue;
+    }
+    //对于那种特殊的，比如这里的事件监听的属性我们需要去掉监听
+    if (/^on[A-Za-z]/.test(propKey)) {
+      var eventType = propKey.replace("on", "");
+      //针对当前的节点取消事件代理
+      $(document).undelegate('[data-reactid="' + this._rootNodeID + '"]', eventType, lastProps[propKey]);
+      continue;
+    }
+
+    //从dom上删除不需要的属性
+    $('[data-reactid="' + this._rootNodeID + '"]').removeAttr(propKey);
+  }
+
+  //对于新的属性，需要写到dom节点上
+  for (propKey in nextProps) {
+    //对于事件监听的属性我们需要特殊处理
+    if (/^on[A-Za-z]/.test(propKey)) {
+      var eventType = propKey.replace("on", "");
+      //以前如果已经有，说明有了监听，需要先去掉
+      lastProps[propKey] && $(document).undelegate('[data-reactid="' + this._rootNodeID + '"]', eventType, lastProps[propKey]);
+      //针对当前的节点添加事件代理,以_rootNodeID为命名空间
+      $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + "." + this._rootNodeID, nextProps[propKey]);
+      continue;
+    }
+
+    if (propKey == "children") continue;
+
+    //添加新的属性，或者是更新老的同名属性
+    $('[data-reactid="' + this._rootNodeID + '"]').prop(propKey, nextProps[propKey]);
+  }
+};
+
+//全局的更新深度标识
+var updateDepth = 0;
+//全局的更新队列，所有的差异都存在这里
+var diffQueue = [];
+
+ReactDOMComponent.prototype._updateDOMChildren = function (nextChildrenElements) {
+  updateDepth++;
+  //_diff用来递归找出差别,组装差异对象,添加到更新队列diffQueue。
+  this._diff(diffQueue, nextChildrenElements);
+  updateDepth--;
+  if (updateDepth == 0) {
+    //在需要的时候调用patch，执行具体的dom操作
+    this._patch(diffQueue);
+    diffQueue = [];
+  }
+};
+
+//差异更新的几种类型
+var UPATE_TYPES = {
+  MOVE_EXISTING: 1,
+  REMOVE_NODE: 2,
+  INSERT_MARKUP: 3
+};
+
+//普通的children是一个数组，此方法把它转换成一个map,key就是element的key,如果是text节点或者element创建时并没有传入key,就直接用在数组里的index标识
+function flattenChildren(componentChildren) {
+  var child;
+  var name;
+  var childrenMap = {};
+  for (var i = 0; i < componentChildren.length; i++) {
+    child = componentChildren[i];
+    name = child && child._currentelement && child._currentelement.key ? child._currentelement.key : i.toString(36);
+    childrenMap[name] = child;
+  }
+  return childrenMap;
+}
+
+//主要用来生成子节点elements的component集合
+//这边注意，有个判断逻辑，如果发现是更新，就会继续使用以前的componentInstance,调用对应的receiveComponent。
+//如果是新的节点，就会重新生成一个新的componentInstance，
+function generateComponentChildren(prevChildren, nextChildrenElements) {
+  var nextChildren = {};
+  nextChildrenElements = nextChildrenElements || [];
+  $.each(nextChildrenElements, function (index, element) {
+    var name = element.key ? element.key : index;
+    var prevChild = prevChildren && prevChildren[name];
+    var prevElement = prevChild && prevChild._currentElement;
+    var nextElement = element;
+
+    //调用_shouldUpdateReactComponent判断是否是更新
+    if (_shouldUpdateReactComponent(prevElement, nextElement)) {
+      //更新的话直接递归调用子节点的receiveComponent就好了
+      prevChild.receiveComponent(nextElement);
+      //然后继续使用老的component
+      nextChildren[name] = prevChild;
+    } else {
+      //对于没有老的，那就重新新增一个，重新生成一个component
+      var nextChildInstance = instantiateReactComponent(nextElement, null);
+      //使用新的component
+      nextChildren[name] = nextChildInstance;
+    }
+  });
+
+  return nextChildren;
+}
+
+//_diff用来递归找出差别,组装差异对象,添加到更新队列diffQueue。
+ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
+  var self = this;
+  //拿到之前的子节点的 component类型对象的集合,这个是在刚开始渲染时赋值的，记不得的可以翻上面
+  //_renderedChildren 本来是数组，我们搞成map
+  var prevChildren = flattenChildren(self._renderedChildren);
+  //生成新的子节点的component对象集合，这里注意，会复用老的component对象
+  var nextChildren = generateComponentChildren(prevChildren, nextChildrenElements);
+  //重新赋值_renderedChildren，使用最新的。
+  self._renderedChildren = [];
+  $.each(nextChildren, function (key, instance) {
+    self._renderedChildren.push(instance);
+  });
+
+  /**注意新增代码**/
+  var lastIndex = 0; //代表访问的最后一次的老的集合的位置
+
+  var nextIndex = 0; //代表到达的新的节点的index
+  //通过对比两个集合的差异，组装差异节点添加到队列中
+  for (name in nextChildren) {
+    if (!nextChildren.hasOwnProperty(name)) {
+      continue;
+    }
+    var prevChild = prevChildren && prevChildren[name];
+    var nextChild = nextChildren[name];
+    //相同的话，说明是使用的同一个component,所以我们需要做移动的操作
+    if (prevChild === nextChild) {
+      //添加差异对象，类型：MOVE_EXISTING
+      /**注意新增代码**/
+      prevChild._mountIndex < lastIndex && diffQueue.push({
+        parentId: self._rootNodeID,
+        parentNode: $("[data-reactid=" + self._rootNodeID + "]"),
+        type: UPATE_TYPES.MOVE_EXISTING,
+        fromIndex: prevChild._mountIndex,
+        toIndex: nextIndex
+      });
+      /**注意新增代码**/
+      lastIndex = Math.max(prevChild._mountIndex, lastIndex);
+    } else {
+      //如果不相同，说明是新增加的节点
+      //但是如果老的还存在，就是element不同，但是component一样。我们需要把它对应的老的element删除。
+      if (prevChild) {
+        //添加差异对象，类型：REMOVE_NODE
+        diffQueue.push({
+          parentId: self._rootNodeID,
+          parentNode: $("[data-reactid=" + self._rootNodeID + "]"),
+          type: UPATE_TYPES.REMOVE_NODE,
+          fromIndex: prevChild._mountIndex,
+          toIndex: null
+        });
+
+        //如果以前已经渲染过了，记得先去掉以前所有的事件监听，通过命名空间全部清空
+        if (prevChild._rootNodeID) {
+          $(document).undelegate("." + prevChild._rootNodeID);
+        }
+
+        /**注意新增代码**/
+        lastIndex = Math.max(prevChild._mountIndex, lastIndex);
+      }
+      //新增加的节点，也组装差异对象放到队列里
+      //添加差异对象，类型：INSERT_MARKUP
+      diffQueue.push({
+        parentId: self._rootNodeID,
+        parentNode: $("[data-reactid=" + self._rootNodeID + "]"),
+        type: UPATE_TYPES.INSERT_MARKUP,
+        fromIndex: null,
+        toIndex: nextIndex,
+        markup: nextChild.mountComponent(self._rootNodeID + "." + name) //新增的节点，多一个此属性，表示新节点的dom内容
+      });
+    }
+    //更新mount的index
+    nextChild._mountIndex = nextIndex;
+    nextIndex++;
+  }
+
+  //对于老的节点里有，新的节点里没有的那些，也全都删除掉
+  for (name in prevChildren) {
+    if (prevChildren.hasOwnProperty(name) && !(nextChildren && nextChildren.hasOwnProperty(name))) {
+      //添加差异对象，类型：REMOVE_NODE
+      diffQueue.push({
+        parentId: self._rootNodeID,
+        parentNode: $("[data-reactid=" + self._rootNodeID + "]"),
+        type: UPATE_TYPES.REMOVE_NODE,
+        fromIndex: prevChildren[name]._mountIndex,
+        toIndex: null
+      });
+      //如果以前已经渲染过了，记得先去掉以前所有的事件监听
+      if (prevChildren[name]._rootNodeID) {
+        $(document).undelegate("." + prevChildren[name]._rootNodeID);
+      }
+    }
+  }
+};
+
+//用于将childNode插入到指定位置
+function insertChildAt(parentNode, childNode, index) {
+  var beforeChild = parentNode.children().get(index);
+  beforeChild ? childNode.insertBefore(beforeChild) : childNode.appendTo(parentNode);
+}
+
+ReactDOMComponent.prototype._patch = function (updates) {
+  var update;
+  var initialChildren = {};
+  var deleteChildren = [];
+  for (var i = 0; i < updates.length; i++) {
+    update = updates[i];
+    if (update.type === UPATE_TYPES.MOVE_EXISTING || update.type === UPATE_TYPES.REMOVE_NODE) {
+      var updatedIndex = update.fromIndex;
+      var updatedChild = $(update.parentNode.children().get(updatedIndex));
+      var parentID = update.parentID;
+
+      //所有需要更新的节点都保存下来，方便后面使用
+      initialChildren[parentID] = initialChildren[parentID] || [];
+      //使用parentID作为简易命名空间
+      initialChildren[parentID][updatedIndex] = updatedChild;
+
+      //所有需要修改的节点先删除,对于move的，后面再重新插入到正确的位置即可
+      deleteChildren.push(updatedChild);
+    }
+  }
+
+  //删除所有需要先删除的
+  $.each(deleteChildren, function (index, child) {
+    $(child).remove();
+  });
+
+  //再遍历一次，这次处理新增的节点，还有修改的节点这里也要重新插入
+  for (var k = 0; k < updates.length; k++) {
+    update = updates[k];
+    switch (update.type) {
+      case UPATE_TYPES.INSERT_MARKUP:
+        insertChildAt(update.parentNode, $(update.markup), update.toIndex);
+        break;
+      case UPATE_TYPES.MOVE_EXISTING:
+        insertChildAt(update.parentNode, initialChildren[update.parentID][update.fromIndex], update.toIndex);
+        break;
+      case UPATE_TYPES.REMOVE_NODE:
+        // 什么都不需要做，因为上面已经帮忙删除掉了
+        break;
+    }
+  }
+};
+
+function ReactCompositeComponent(element) {
+  //存放元素element对象
+  this._currentElement = element;
+  //存放唯一标识
+  this._rootNodeID = null;
+  //存放对应的ReactClass的实例
+  this._instance = null;
+}
+
+//用于返回当前自定义元素渲染时应该返回的内容
+ReactCompositeComponent.prototype.mountComponent = function (rootID) {
+  this._rootNodeID = rootID;
+  //拿到当前元素对应的属性值
+  var publicProps = this._currentElement.props;
+  //拿到对应的ReactClass
+  var ReactClass = this._currentElement.type;
+  // Initialize the public class
+  var inst = new ReactClass(publicProps);
+  this._instance = inst;
+  //保留对当前comonent的引用，下面更新会用到
+  inst._reactInternalInstance = this;
+
+  if (inst.componentWillMount) {
+    inst.componentWillMount();
+    //这里在原始的reactjs其实还有一层处理，就是  componentWillMount调用setstate，不会触发rerender而是自动提前合并，这里为了保持简单，就略去了
+  }
+  //调用ReactClass的实例的render方法,返回一个element或者一个文本节点
+  var renderedElement = this._instance.render();
+  //得到renderedElement对应的component类实例
+  var renderedComponentInstance = instantiateReactComponent(renderedElement);
+  this._renderedComponent = renderedComponentInstance; //存起来留作后用
+
+  //拿到渲染之后的字符串内容，将当前的_rootNodeID传给render出的节点
+  var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
+
+  //之前我们在React.render方法最后触发了mountReady事件，所以这里可以监听，在渲染完成后会触发。
+  $(document).on("mountReady", function () {
+    //调用inst.componentDidMount
+    inst.componentDidMount && inst.componentDidMount();
+  });
+
+  return renderedMarkup;
+};
+
+ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
+  //如果接受了新的，就使用最新的element
+  this._currentElement = nextElement || this._currentElement;
+
+  var inst = this._instance;
+  //合并state
+  var nextState = $.extend(inst.state, newState);
+  var nextProps = this._currentElement.props;
+
+  //改写state
+  inst.state = nextState;
+
+  //如果inst有shouldComponentUpdate并且返回false。说明组件本身判断不要更新，就直接返回。
+  if (inst.shouldComponentUpdate && inst.shouldComponentUpdate(nextProps, nextState) === false) return;
+
+  //生命周期管理，如果有componentWillUpdate，就调用，表示开始要更新了。
+  if (inst.componentWillUpdate) inst.componentWillUpdate(nextProps, nextState);
+
+  var prevComponentInstance = this._renderedComponent;
+  var prevRenderedElement = prevComponentInstance._currentElement;
+  //重新执行render拿到对应的新element;
+  var nextRenderedElement = this._instance.render();
+
+  //判断是需要更新还是直接就重新渲染
+  //注意这里的_shouldUpdateReactComponent跟上面的不同哦 这个是全局的方法
+  if (_shouldUpdateReactComponent(prevRenderedElement, nextRenderedElement)) {
+    //如果需要更新，就继续调用子节点的receiveComponent的方法，传入新的element更新子节点。
+    prevComponentInstance.receiveComponent(nextRenderedElement);
+    //调用componentDidUpdate表示更新完成了
+    inst.componentDidUpdate && inst.componentDidUpdate();
+  } else {
+    //如果发现完全是不同的两种element，那就干脆重新渲染了
+    var thisID = this._rootNodeID;
+    //重新new一个对应的component，
+    this._renderedComponent = this._instantiateReactComponent(nextRenderedElement);
+    //重新生成对应的元素内容
+    var nextMarkup = _renderedComponent.mountComponent(thisID);
+    //替换整个节点
+    $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
+  }
+};
+
+//用来判定两个element需不需要更新
+//这里的key是我们createElement的时候可以选择性的传入的。用来标识这个element，当发现key不同时，我们就可以直接重新渲染，不需要去更新了。
+var _shouldUpdateReactComponent = function (prevElement, nextElement) {
   if (prevElement != null && nextElement != null) {
     var prevType = typeof prevElement;
     var nextType = typeof nextElement;
@@ -10498,425 +10958,99 @@ function _shouldUpdateReactComponent(prevElement, nextElement) {
     }
   }
   return false;
-}
+};
 
-// 实例化
 function instantiateReactComponent(node) {
+  //文本节点的情况
   if (typeof node === "string" || typeof node === "number") {
-    // 文本类型
-    return new _ReactDOMTextComponent__WEBPACK_IMPORTED_MODULE_2__["default"](node);
-  } else if (typeof node === "object" && typeof node.type === "string") {
-    // ReactDOMComponent
-    return new _ReactDOMComponent__WEBPACK_IMPORTED_MODULE_3__["default"](node);
-  } else if (typeof node === "object" && typeof node.type === "function") {
-    // node.type 是否为一个 Constructor 构造函数类
-    // 自定义组件
-    return new _ReactCompositeComponent__WEBPACK_IMPORTED_MODULE_4__["default"](node);
+    return new ReactDOMTextComponent(node);
+  }
+  //浏览器默认节点的情况
+  if (typeof node === "object" && typeof node.type === "string") {
+    //注意这里，使用了一种新的component
+    return new ReactDOMComponent(node);
+  }
+  //自定义的元素节点
+  if (typeof node === "object" && typeof node.type === "function") {
+    //注意这里，使用新的component,专门针对自定义元素
+    return new ReactCompositeComponent(node);
   }
 }
 
-// React对象
-const React = {
+//ReactElement就是虚拟dom的概念，具有一个type属性代表当前的节点类型，还有节点的属性props
+//比如对于div这样的节点type就是div，props就是那些propibutes
+//另外这里的key,可以用来标识这个element，用于优化以后的更新，这里可以先不管，知道有这么个东西就好了
+function ReactElement(type, key, props) {
+  this.type = type;
+  this.key = key;
+  this.props = props;
+}
+
+//定义ReactClass类,所有自定义的超级父类
+var ReactClass = function () {};
+//留给子类去继承覆盖
+ReactClass.prototype.render = function () {};
+
+//setState
+ReactClass.prototype.setState = function (newState) {
+  //还记得我们在ReactCompositeComponent里面mount的时候 做了赋值
+  //所以这里可以拿到 对应的ReactCompositeComponent的实例_reactInternalInstance
+  this._reactInternalInstance.receiveComponent(null, newState);
+};
+
+React = {
   nextReactRootIndex: 0,
-
+  createClass: function (spec) {
+    //生成一个子类
+    var Constructor = function (props) {
+      this.props = props;
+      this.state = this.getInitialState ? this.getInitialState() : null;
+    };
+    //原型继承，继承超级父类
+    Constructor.prototype = new ReactClass();
+    Constructor.prototype.constructor = Constructor;
+    //混入spec到原型
+    $.extend(Constructor.prototype, spec);
+    return Constructor;
+  },
   createElement: function (type, config, children) {
-    var propsName,
-        props = {},
-        config = config || {},
-        key = null;
+    var props = {},
+        propName;
+    config = config || {};
+    //看有没有key，用来标识element的类型，方便以后高效的更新，这里可以先不管
+    var key = config.key || null;
 
-    if (config != null) {
-      key = config.key === undefined ? null : "" + config.key;
-      for (propsName in config) {
-        // config.hasOwnProperty 是否为对象自身拥有该属性，而不是原型上的
-        if (propsName !== "key" && config.hasOwnProperty(propsName)) {
-          props[propsName] = config[propsName];
-        }
+    //复制config里的内容到props
+    for (propName in config) {
+      if (config.hasOwnProperty(propName) && propName !== "key") {
+        props[propName] = config[propName];
       }
     }
-
+    //处理children,全部挂载到props的children属性上
+    //支持两种写法，如果只有一个参数，直接赋值给children，否则做合并处理
     var childrenLength = arguments.length - 2;
     if (childrenLength === 1) {
-      props.children = Array.isArray(props.children) ? props.children : [props.children];
+      props.children = $.isArray(children) ? children : [children];
     } else if (childrenLength > 1) {
       var childArray = Array(childrenLength);
-      for (var i = 0; i < childrenLength; ++i) {
+      for (var i = 0; i < childrenLength; i++) {
         childArray[i] = arguments[i + 2];
       }
       props.children = childArray;
     }
-
-    if (type && type.defaultProps) {
-      var defaultProps = type.defaultProps;
-      for (propsName in defaultProps) {
-        if (typeof props[propsName] === "undefined") {
-          // 如果某个属性为空，则取默认属性
-          props[propsName] = defaultProps[propsName];
-        }
-      }
-    }
-
-    // 返回一个ReactElement实例对象
-    return new _ReactElement__WEBPACK_IMPORTED_MODULE_0__["default"](type, props, key);
+    return new ReactElement(type, key, props);
   },
-
-  createClass: function (spec) {
-    /**
-     * Constructor 类
-     * Constructor 持有 ReactClass 的 prototype 饮用
-     * Constructor 最终混入 传入的各种属性和方法
-     * @param {object} props 拥有属性
-     * @private {object} State
-     * @return {返回一个混入了 ReactClass原型和 spec属性方法的强化 Constructor类}
-     * @return {为一个复合组件类，其中包含有自己的 props 和 state }
-     */
-    function Constructor(props) {
-      this.props = props;
-      this.state = this.getInitialState ? this.getInitialState() : null;
-    }
-    Constructor.prototype = new _ReactClass__WEBPACK_IMPORTED_MODULE_1__["default"]();
-    Constructor.prototype.constructor = Constructor;
-
-    // 混入 spec 的原型
-    $.extend(Constructor.prototype, spec);
-    return Constructor;
-  },
-
   render: function (element, container) {
     var componentInstance = instantiateReactComponent(element);
     var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
     $(container).html(markup);
+    //触发完成mount的事件
     $(document).trigger("mountReady");
   }
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (React);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
-
-/***/ }),
-
-/***/ "./react/ReactClass.js":
-/*!*****************************!*\
-  !*** ./react/ReactClass.js ***!
-  \*****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-function ReactClass() {}
-
-ReactClass.prototype.render = function () {};
-
-ReactClass.prototype.setState = function (newState) {
-  // 自定义组件 mountComponent 首次装载时保存 ReactCompositeComponent 实例
-  this._reactInternalInstance.receiveComponent(null, newState);
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (ReactClass);
-
-/***/ }),
-
-/***/ "./react/ReactCompositeComponent.js":
-/*!******************************************!*\
-  !*** ./react/ReactCompositeComponent.js ***!
-  \******************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _ReactClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReactClass */ "./react/ReactClass.js");
-/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./React */ "./react/React.js");
-
-
-
-// 自定义类型
-function ReactCompositeComponent(element) {
-  this._currentElement = element;
-  this._rootNodeID = null;
-  this._instance = null;
-}
-
-/**
- * 首次装载
- * @param {*} rootID
- */
-ReactCompositeComponent.prototype.mountComponent = function (rootID) {
-  this._rootNodeID = rootID;
-
-  var publicProps = this._currentElement.props;
-
-  // this._currentElement.type 为 Constructor 构造函数类
-  var ReactClass = this._currentElement.type;
-
-  // 实例化 一个 Constructor 复合组件 拥有自己的 props 和 state
-  var inst = new ReactClass(publicProps);
-
-  this._instance = inst;
-  inst._reactInternalInstance = this;
-
-  if (inst.componentWillMount) {
-    inst.componentWillMount();
-  }
-
-  // 复合组件的 render() 方法
-  // 返回一个需要渲染的元素 类型不确定
-  var renderedElement = this._instance.render();
-  // 实例化子组件实例
-  var renderedComponentInstance = Object(_React__WEBPACK_IMPORTED_MODULE_1__["instantiateReactComponent"])(renderedElement);
-  // 缓存子组件实例
-  this._renderedComponent = renderedComponentInstance;
-  // 装载子组件
-  var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
-
-  //之前我们在React.render 方法最后触发了 mountReady事件，所以这里可以监听，在渲染完成后会触发。
-  $(document).on("mountReady", function () {
-    // 当子组件的 componentDidMount() 方法调用完后 调用父组件的 componentDidMount() 方法
-    // 调用inst.componentDidMount
-    inst.componentDidMount && inst.componentDidMount();
-  });
-
-  return renderedMarkup;
-};
-
-/**
- * 更新
- * @param {*} nextElement
- * @param {*} newState
- */
-ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
-  this._currentElement = nextElement || this._currentElement;
-
-  // 复合组件实例
-  // 内部有props 和 state
-  var inst = this._instance;
-
-  // 合并state
-  // 当 state 合并相同属性出现将会替换
-  var nextState = $.extend(inst.state, newState);
-  // 获取当前props
-  var nextProps = this._currentElement.props;
-
-  // 改写state
-  inst.state = nextState;
-
-  // 如果 inst 有 shouldComponentUpdate 并且返回 false。说明组件本身判断不要更新，就直接返回。
-  if (inst.shouldComponentUpdate && inst.shouldComponentUpdate(nextProps, nextState) === false) {
-    return null;
-  }
-
-  // 有生命周期componentWillUpdate
-  if (inst.componentWillUpdate) {
-    inst.componentWillUpdate(nextProps, nextState);
-  }
-
-  // 拿到子组件实例
-  var prevComponentInstance = this._renderedComponent;
-  var prevRenderedElement = prevComponentInstance._currentElement;
-
-  // 拿到新的 element
-  var nextRenderedElement = this._instance.render();
-
-  // _shouldUpdateReactComponent 全局方法
-  // 判断是需要更新还是直接就重新渲染
-  if (Object(_React__WEBPACK_IMPORTED_MODULE_1__["_shouldUpdateReactComponent"])(prevRenderedElement, nextRenderedElement)) {
-    // 如果需要更新，就继续调用子节点的receiveComponent的方法，传入新的element更新子节点。
-    prevComponentInstance.receiveComponent(nextRenderedElement);
-    // 调用componentDidUpdate表示更新完成了
-    inst.componentDidUpdate && inst.componentDidUpdate();
-  } else {
-    // 如果发现完全是不同的两种element，那就干脆重新渲染了
-    var thisID = this._rootNodeID;
-
-    var renderedComponentInstance = Object(_React__WEBPACK_IMPORTED_MODULE_1__["instantiateReactComponent"])(nextRenderedElement);
-
-    // 重新 new 一个对应的 component
-    this._renderedComponent = renderedComponentInstance;
-
-    // 重新生成对应的元素内容
-    var nextMarkup = renderedComponentInstance.mountComponent(thisID);
-
-    // 替换整个节点
-    $('[data-reactid="' + this._rootNodeID + '"]').replaceWith(nextMarkup);
-  }
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (ReactCompositeComponent);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
-
-/***/ }),
-
-/***/ "./react/ReactDOMComponent.js":
-/*!************************************!*\
-  !*** ./react/ReactDOMComponent.js ***!
-  \************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
-
-
-// ReactDOMComponent
-function ReactDOMComponent(element) {
-  this._currentElement = element;
-  this._rootNodeID = null;
-}
-
-// 首次装载
-ReactDOMComponent.prototype.mountComponent = function (rootID) {
-  this._rootNodeID = rootID;
-  var props = this._currentElement.props;
-  var tagOpen = "<" + this._currentElement.type;
-  var tagClose = "</" + this._currentElement.type + ">";
-  tagOpen += " data-reactid=" + this._rootNodeID;
-
-  for (var propKey in props) {
-    if (/^on[A-Za-z]/.test(propKey)) {
-      // 这里要做一下事件的监听，就是从属性 props 里面解析拿出 on 开头的事件属性的对应事件监听
-      var eventType = propKey.replace("on", "");
-      // 将事件委托到 data-reactid = this._rootNodeID 上
-      $(document).delegate('[data-reactid="' + this._rootNodeID + '"]', eventType + "." + this._rootNodeID, props[propKey]);
-    }
-
-    // 对于children属性以及事件监听的属性不需要进行字符串拼接
-    // 事件会代理到全局。这边不能拼到dom上不然会产生原生的事件监听
-    if (props[propKey] && propKey != "children" && !/^on[A-Za-z]/.test(propKey)) {
-      tagOpen += " " + propKey + "=" + props[propKey];
-    }
-  }
-
-  // 记录所有 children 中生成的 html
-  var content = "";
-
-  var children = props.children || [];
-  // 用于保存所有的子节点的 component 实例，以后会用到
-  var childrenInstances = [];
-  var that = this;
-  $.each(children, function (key, child) {
-    // 这里再次调用了 instantiateReactComponent 实例化子节点 component 类，拼接好返回
-    // children 为 React.createElement(type, props, children) 中的所有 children 数组
-    var childComponentInstance = Object(_React__WEBPACK_IMPORTED_MODULE_0__["instantiateReactComponent"])(child);
-    childComponentInstance._mountIndex = key;
-
-    childrenInstances.push(childComponentInstance);
-
-    // 子节点的 rootId 是父节点的 rootId 加上新的 key 也就是顺序的值拼成的新值
-    var curRootId = that._rootNodeID + "." + key;
-    // 得到子节点的渲染内容
-    var childMarkup = childComponentInstance.mountComponent(curRootId);
-    // 拼接在一起
-    content += " " + childMarkup;
-  });
-
-  // 留给以后更新时用的这边先不用管
-  this._renderedChildren = childrenInstances;
-
-  // 拼出整个html内容
-  return tagOpen + ">" + content + tagClose;
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (ReactDOMComponent);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
-
-/***/ }),
-
-/***/ "./react/ReactDOMTextComponent.js":
-/*!****************************************!*\
-  !*** ./react/ReactDOMTextComponent.js ***!
-  \****************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {// React 文本
-function ReactDOMTextComponent(text) {
-  this._currentElement = "" + text;
-  this._rootId = null;
-}
-
-/**
- * 首次装载
- **/
-ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
-  this._rootId = rootID;
-  return '<span data-reactid="' + rootID + '">' + this._currentElement + "</span>";
-};
-
-/**
- * 更新文本节点
- * @param {*} nextText
- */
-ReactDOMTextComponent.prototype.receiveComponent = function (nextText) {
-  var nextStringText = "" + nextText;
-  if (nextStringText !== this._currentElement) {
-    this._currentElement = nextStringText;
-    $('[data-reactid="' + this._rootNodeID + '"]').html(this._currentElement);
-  }
-};
-
-/* harmony default export */ __webpack_exports__["default"] = (ReactDOMTextComponent);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
-
-/***/ }),
-
-/***/ "./react/ReactElement.js":
-/*!*******************************!*\
-  !*** ./react/ReactElement.js ***!
-  \*******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReactElement; });
-// 虚拟dom模型
-function ReactElement(type, props, key) {
-  this.type = type;
-  this.props = props;
-  this.key = key;
-}
-
-/***/ }),
-
-/***/ "./react/index.js":
-/*!************************!*\
-  !*** ./react/index.js ***!
-  \************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
-
-
-// React.render("hello world", document.getElementById("root"));
-
-var HelloMessage = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createClass({
-  getInitialState: function () {
-    return {
-      type: "say "
-    };
-  },
-  changeType: function () {
-    this.setState({
-      type: "running"
-    });
-  },
-  render: function () {
-    return _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", {
-      onclick: this.changeType.bind(this) // 绑定 this 指向
-    }, this.state.type, "Hello", this.props.name);
-  }
-});
-
-const entry = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(HelloMessage, { key: "entry", name: "John" });
-const root = document.getElementById("root");
-_React__WEBPACK_IMPORTED_MODULE_0__["default"].render(entry, root);
 
 /***/ })
 
