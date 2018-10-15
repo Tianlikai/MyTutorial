@@ -10466,55 +10466,9 @@ return jQuery;
 /*!************************!*\
   !*** ./react/index.js ***!
   \************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _main_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main.js */ "./react/main.js");
-
-
-var TodoList = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createClass({
-  getInitialState: function () {
-    return { items: [] };
-  },
-  add: function () {
-    var nextItems = this.state.items.concat([this.state.text]);
-    this.setState({ items: nextItems, text: "" });
-  },
-  onChange: function (e) {
-    this.setState({ text: e.target.value });
-  },
-  render: function () {
-    var createItem = function (itemText) {
-      return _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, itemText);
-    };
-
-    var lists = this.state.items.map(createItem);
-    var input = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("input", {
-      onkeyup: this.onChange.bind(this),
-      value: this.state.text
-    });
-    var button = _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("p", { onclick: this.add.bind(this) }, "Add#" + (this.state.items.length + 1));
-    var children = [input, button].concat(lists);
-
-    return _main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, children);
-  }
-});
-
-_main_js__WEBPACK_IMPORTED_MODULE_0__["default"].render(_main_js__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(TodoList), document.getElementById("container"));
-
-/***/ }),
-
-/***/ "./react/main.js":
-/*!***********************!*\
-  !*** ./react/main.js ***!
-  \***********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function($) {//component类，用来表示文本在渲染，更新，删除时应该做些什么事情
 function ReactDOMTextComponent(text) {
   //存下当前的字符串
@@ -10998,7 +10952,7 @@ ReactClass.prototype.setState = function (newState) {
   this._reactInternalInstance.receiveComponent(null, newState);
 };
 
-React = {
+var React = {
   nextReactRootIndex: 0,
   createClass: function (spec) {
     //生成一个子类
@@ -11048,8 +11002,6 @@ React = {
     $(document).trigger("mountReady");
   }
 };
-
-/* harmony default export */ __webpack_exports__["default"] = (React);
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
 
 /***/ })

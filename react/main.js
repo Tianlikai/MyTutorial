@@ -549,7 +549,7 @@ ReactClass.prototype.setState = function(newState) {
   this._reactInternalInstance.receiveComponent(null, newState);
 };
 
-React = {
+var React = {
   nextReactRootIndex: 0,
   createClass: function(spec) {
     //生成一个子类
