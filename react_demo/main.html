@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="./react/index.js"></script>
+    <script src="./index.js"></script>
 
 
     <style type="text/css">
@@ -40,7 +40,7 @@
     <div id="container"></div>
 
     <script type="text/javascript">
-
+        // 定义一个TodoList复合组件
         var TodoList = React.createClass({
             getInitialState: function () {
                 return { items: [] };
@@ -66,8 +66,9 @@
             }
         });
 
-
-        React.render(React.createElement(TodoList), document.getElementById("container"));
+        var Entry = React.createElement(TodoList)
+        var root = document.getElementById("container")
+        React.render(Entry, root);
 
 
     </script>
