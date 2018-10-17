@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 const srcDir = path.join(__dirname, "./src");
-const distDir = path.join(__dirname, "./dist");
+const distDir = path.join(__dirname, "./react/dist");
 
 const env = process.env.NODE_ENV.trim();
 
