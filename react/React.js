@@ -24,7 +24,7 @@ const React = {
     // 如果有 key 则作为元素的唯一标示
     var key = config.key || null;
 
-    return new 
+    return new ReactElement(key, type, props);
   },
 
   /**
