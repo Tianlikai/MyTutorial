@@ -57,9 +57,9 @@ const React = {
    */
   render: function(element, container) {
     // 实例化组件
-    var ComponentInstance = instantiateReactComponent(element);
+    var componentInstance = instantiateReactComponent(element);
     // 组件完成装载
-    var markup = ComponentInstance.mountComponent(React.nextReactRootIndex++);
+    var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
     // 将装载好的 html 放入 container 中
     $(container).html(markup);
     $(document).trigger("mountReady");
