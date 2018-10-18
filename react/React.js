@@ -55,7 +55,15 @@ const React = {
    * @param {*} element React元素
    * @param {*} container 负责装载的dom
    */
-  render: function(element, container) {}
+  render: function(element, container) {
+    // 实例化组件
+    var ComponentInstance = instantiateReactComponent(element);
+    // 组件完成装载
+    var markup = ComponentInstance.mountComponent(ComponentInstance);
+    // 将装载好的 html 放入 container 中
+    $(container).html(markup);
+    $(document).trigger("mountReady");
+  }
 };
 
 export default React;
