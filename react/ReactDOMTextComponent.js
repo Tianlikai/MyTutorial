@@ -20,4 +20,16 @@ ReactDOMTextComponent.prototype.mountComponent = function(rootID) {
   }</span>`;
 };
 
+/**
+ * component 类 更新
+ * @param {*} newText
+ */
+ReactDOMTextComponent.prototype.receiveComponent = function(newText) {
+  var newStringText = "" + newText;
+  if (newStringText !== this._currentElement) {
+    this._currentElement = newStringText;
+    $(`data-reactid="${this._rootNodeID}"`).html(this._currentElement);
+  }
+};
+
 export default ReactDOMTextComponent;
