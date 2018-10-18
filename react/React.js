@@ -1,8 +1,6 @@
 import ReactClass from "./ReactClass";
 import ReactElement from "./ReactElement";
-import ReactDOMComponent from "./ReactDOMComponent";
-import ReactDOMTextComponent from "./ReactDOMTextComponent";
-import ReactCompositeComponent from "./ReactCompositeComponent";
+import instantiateReactComponent from "./util/instantiateReactComponent";
 
 /**
  * React 对象
