@@ -10487,6 +10487,25 @@ const React = {
   nextReactRootIndex: 0,
 
   /**
+   * 创建 ReactClass
+   * @param {*} spec 传入的对象
+   */
+  createClass: function (spec) {
+    // 定义一个子类
+    function Constructor(props) {
+      this.props = props;
+      this.state = this.getInitialState ? this.getInitialState() : null;
+    }
+    // 原型继承，继承超父类
+    Constructor.prototype = new _ReactClass__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    Constructor.prototype.constructor = Constructor;
+
+    // 将spec，混入Constructor.prototype
+    Object.assign(Constructor.prototype, spec);
+    return Constructor;
+  },
+
+  /**
    * @param {*} type 元素的 component 类型
    * @param {*} config 元素配置
    * @param {*} children 元素的子元素
@@ -10557,9 +10576,12 @@ const React = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /**
- * 复合元素
+ * 所有自定义组件的超类
+ * @function render所有自定义组件都有该方法
  */
 function ReactClass() {}
+
+ReactClass.prototype.render = function () {};
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactClass);
 
@@ -10574,6 +10596,9 @@ function ReactClass() {}
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/instantiateReactComponent */ "./react/util/instantiateReactComponent.js");
+
+
 /**
  * component 类
  * 复合组件类型
@@ -10585,7 +10610,46 @@ function ReactCompositeComponent(element) {
   this._instance = null;
 }
 
+/**
+ * component 类 装载方法
+ * @param {*} rootID 元素id
+ * @param {string} 返回dom
+ */
+ReactCompositeComponent.prototype.mountComponent = function (rootID) {
+  this._rootNodeID = rootID;
+
+  // 当前元素属性
+  var publicProps = this._currentElement.props;
+  // 对应的ReactClass
+  var ReactClass = this._currentElement.type;
+
+  var inst = new ReactClass(publicProps);
+  this._instance = inst;
+
+  // 保留对当前 component的饮用
+  inst._reactInternalInstance = this;
+
+  if (inst.componentWillMount) {
+    // 声明周期方法
+    inst.componentWillMount();
+  }
+
+  // 调用 ReactClass 实例的render 方法，返回一个element或者文本节点
+  var renderedElement = this._instance.render();
+  var renderedComponentInstance = Object(_util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__["default"])(renderedElement);
+  this._renderedComponent = renderedComponentInstance; // 缓存component 以后用
+
+  var renderedMarkup = renderedComponentInstance.mountComponent(this._rootNodeID);
+
+  // dom 装载到html 后调用生命周期
+  $(document).on("mountReady", function () {
+    inst.componentDidMount && inst.componentDidMount();
+  });
+  return renderedMarkup;
+};
+
 /* harmony default export */ __webpack_exports__["default"] = (ReactCompositeComponent);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
 
 /***/ }),
 
@@ -10743,13 +10807,51 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * ReactDOMComponent组件
  */
-function sayHello() {
-  alert("hello");
-}
-var div = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", {}, "jason");
-var DOMComponent = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", { key: "jason", age: 22, onclick: sayHello }, "hello worlds!", div);
+// function sayHello() {
+//   alert("hello");
+// }
+// var div = React.createElement("div", {}, "jason");
+// var DOMComponent = React.createElement(
+//   "div",
+//   { key: "jason", age: 22, onclick: sayHello },
+//   "hello worlds!",
+//   div
+// );
+// var root = document.getElementById("container");
+// React.render(DOMComponent, root);
+
+/**
+ * ReactCompositeComponent组件
+ */
+var CompositeComponent = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createClass({
+  getInitialState: function () {
+    return {
+      items: []
+    };
+  },
+  componentWillMount: function () {
+    console.log("声明周期: " + "componentWillMount");
+  },
+  componentDidMount: function () {
+    console.log("声明周期: " + "componentDidMount");
+  },
+  render: function () {
+    var h1 = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("h1", null, "hello world!");
+    var h2 = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("h2", null, "this is React");
+    var children = [h1, h2];
+
+    return _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, children);
+  }
+});
+
+var CompositeElement = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement(CompositeComponent, {
+  name: "jason",
+  age: 22
+});
+
 var root = document.getElementById("container");
-_React__WEBPACK_IMPORTED_MODULE_0__["default"].render(DOMComponent, root);
+
+_React__WEBPACK_IMPORTED_MODULE_0__["default"].render(CompositeElement, root);
 
 /* harmony default export */ __webpack_exports__["default"] = (_React__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
