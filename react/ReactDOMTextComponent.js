@@ -11,7 +11,7 @@ function ReactDOMTextComponent(text) {
 /**
  * component 类 装载方法
  * @param {number} rootID 元素id
- * @return {string} 返回html
+ * @return {string} 返回dom
  */
 ReactDOMTextComponent.prototype.mountComponent = function(rootID) {
   this._rootNodeID = rootID;
