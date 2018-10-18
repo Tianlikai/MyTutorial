@@ -11,6 +11,25 @@ const React = {
   nextReactRootIndex: 0,
 
   /**
+   * 创建 ReactClass
+   * @param {*} spec 传入的对象
+   */
+  createClass: function(spec) {
+    // 定义一个子类
+    function Constructor(props) {
+      this.props = props;
+      this.state = this.getInitialState ? this.getInitialState() : null;
+    }
+    // 原型继承，继承超父类
+    Constructor.prototype = new ReactClass();
+    Constructor.prototype.constructor = Constructor;
+
+    // 将spec，混入Constructor.prototype
+    Object.assign(Constructor.prototype, spec);
+    return Constructor;
+  },
+
+  /**
    * @param {*} type 元素的 component 类型
    * @param {*} config 元素配置
    * @param {*} children 元素的子元素
