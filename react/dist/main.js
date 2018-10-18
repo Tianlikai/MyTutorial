@@ -10534,9 +10534,9 @@ const React = {
   render: function (element, container) {
     // 实例化组件
     var componentInstance = Object(_util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_2__["default"])(element);
-    // 组件完成装载
+    // 组件完成dom装载
     var markup = componentInstance.mountComponent(React.nextReactRootIndex++);
-    // 将装载好的 html 放入 container 中
+    // 将装载好的 dom 放入 container 中
     $(container).html(markup);
     $(document).trigger("mountReady");
   }
@@ -10598,6 +10598,9 @@ function ReactCompositeComponent(element) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/instantiateReactComponent */ "./react/util/instantiateReactComponent.js");
+
+
 /**
  * component 类
  * react 基础标签类型，类似与html中的（'div','span' 等）
@@ -10608,7 +10611,54 @@ function ReactDOMComponent(element) {
   this._rootNodeID = null;
 }
 
+/**
+ * component 类 装载方法
+ * @param {*} rootID 元素id
+ * @param {string} 返回dom
+ */
+ReactDOMComponent.prototype.mountComponent = function (rootID) {
+  this._rootNodeID = rootID;
+  var props = this._currentElement.props;
+
+  // 外层标签
+  var tagOpen = `<${this._currentElement.type} data-reactid="${this._rootNodeID}"`;
+  var tagClose = `</${this._currentElement.type}>`;
+
+  // 拼接标签属性
+  for (var propName in props) {
+    // 属性为绑定事件
+    if (/^on[A-Za-z]/.test(propName)) {
+      var eventType = propName.replace("on", "");
+      // 对当前节点添加事件代理
+      $(document).delegate(`[data-reactid="${this._rootNodeID}"]`, `${eventType}.${this._rootNodeID}`, props[propName]);
+    }
+
+    // 对于props 上的children和事件属性不做处理
+    if (props[propName] && propName !== "children" && !/^on[A-Za-z]/.test(propName)) {
+      tagOpen += ` ${propName}=${props[propName]}`;
+    }
+  }
+  // 渲染子节点dom
+  var content = "";
+  var children = props.children || [];
+  var childrenInstance = []; // 保存子节点component 实例
+
+  children.forEach((child, key) => {
+    var childComponentInstance = Object(_util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__["default"])(child);
+    // 为子节点添加标记
+    childComponentInstance._mountIndex = key;
+    childrenInstance.push(childComponentInstance);
+
+    var childMarkup = childComponentInstance.mountComponent(`${this._rootNodeID}.${key}`);
+
+    // 拼接子节点dom
+    content += childMarkup;
+  });
+  return tagOpen + ">" + content + tagClose;
+};
+
 /* harmony default export */ __webpack_exports__["default"] = (ReactDOMComponent);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
 
 /***/ }),
 
@@ -10634,7 +10684,7 @@ function ReactDOMTextComponent(text) {
 /**
  * component 类 装载方法
  * @param {number} rootID 元素id
- * @return {string} 返回html
+ * @return {string} 返回dom
  */
 ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
   this._rootNodeID = rootID;
@@ -10682,10 +10732,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _React__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./React */ "./react/React.js");
 
 
-var Com = "hello world!";
-var root = document.getElementById("container");
+/**
+ * ReactDOMTextComponent组件
+ */
+// var TextComponent = "hello world!";
+// var root = document.getElementById("container");
 
-_React__WEBPACK_IMPORTED_MODULE_0__["default"].render(Com, root);
+// React.render(TextComponent, root);
+
+/**
+ * ReactDOMComponent组件
+ */
+function sayHello() {
+  alert("hello");
+}
+var div = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", {}, "jason");
+var DOMComponent = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", { key: "jason", age: 22, onclick: sayHello }, "hello worlds!", div);
+var root = document.getElementById("container");
+_React__WEBPACK_IMPORTED_MODULE_0__["default"].render(DOMComponent, root);
 
 /* harmony default export */ __webpack_exports__["default"] = (_React__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
