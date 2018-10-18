@@ -7,6 +7,12 @@
 - 更新机制（setState）（批量更新）
 - diff 算法
 
+## 未实现类容
+
+- instantiateReactComponent 没有实现空类型处理
+- 事件代理直接使用 jquery 代理到 document，React 的事件处理非常复杂，实现了一套标准的 w3c 事件。
+- tagOpen 和 tagClose 没有针对 input，img 等非闭合标签进行处理
+
 ## dom 模型
 
 React dom 由一下几种

@@ -6,4 +6,9 @@ function ReactClass() {}
 
 ReactClass.prototype.render = function() {};
 
+ReactClass.prototype.setState = function(newState) {
+  // 拿到ReactCompositeComponent的实例
+  this._reactInternalInstance.receiveComponent(null, newState);
+};
+
 export default ReactClass;
