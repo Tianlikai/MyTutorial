@@ -22,3 +22,5 @@ function _shouldUpdateReactComponent(preElement, nextElement) {
   }
   return false;
 }
+
+export default _shouldUpdateReactComponent;
