@@ -10583,6 +10583,11 @@ function ReactClass() {}
 
 ReactClass.prototype.render = function () {};
 
+ReactClass.prototype.setState = function (newState) {
+  // 拿到ReactCompositeComponent的实例
+  this._reactInternalInstance.receiveComponent(null, newState);
+};
+
 /* harmony default export */ __webpack_exports__["default"] = (ReactClass);
 
 /***/ }),
@@ -10597,6 +10602,8 @@ ReactClass.prototype.render = function () {};
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/instantiateReactComponent */ "./react/util/instantiateReactComponent.js");
+/* harmony import */ var _util_shouldUpdateReactComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/_shouldUpdateReactComponent */ "./react/util/_shouldUpdateReactComponent.js");
+
 
 
 /**
@@ -10646,6 +10653,55 @@ ReactCompositeComponent.prototype.mountComponent = function (rootID) {
     inst.componentDidMount && inst.componentDidMount();
   });
   return renderedMarkup;
+};
+
+/**
+ * component 类 更新
+ * @param {*} nextElement
+ * @param {*} newState
+ */
+ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newState) {
+  // 如果接受了新的element，则直接使用最新的element
+  this._currentElement = nextElement || this._currentElement;
+
+  var inst = this._instance;
+
+  // 合并state
+  var nextState = Object.assign(inst.state, newState);
+  var nextProps = this._currentElement.props;
+
+  // 更新state
+  inst.state = nextState;
+
+  // 生命周期方法
+  if (inst.shouldComponentUpdate && inst.shouldComponentUpdate(nextProps, nextState) === false) {
+    // 如果实例的 shouldComponentUpdate 返回 false，则不需要继续往下执行更新
+    return;
+  }
+
+  // 生命周期方法
+  inst.componentWillUpdate && inst.componentWillUpdate(nextProps, nextState);
+
+  // 获取老的element
+  var preComponentInstance = this._renderedComponent;
+  var preRenderedElement = preComponentInstance._currentElement;
+
+  // 通过重新render 获取新的element
+  var nextRenderedElement = this._instance.render();
+
+  // 比较新旧元素
+  if (Object(_util_shouldUpdateReactComponent__WEBPACK_IMPORTED_MODULE_1__["default"])(preRenderedElement, nextRenderedElement)) {
+    // 两种元素为相同，需要更新，执行字节点更新
+    preComponentInstance.receiveComponent(nextRenderedElement);
+    // 生命周期方法
+    inst.componentDidUpdate && inst.componentDidUpdate();
+  } else {
+    // 两种元素的类型不同，直接重新装载dom
+    var thisID = this._rootNodeID;
+    this._renderedComponent = Object(_util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__["default"])(nextRenderedElement);
+    var renderedMarkup = this._renderedComponent.mountComponent(thisID);
+    $(`[data-reactid="${thisID}"`).replaceWith(renderedMarkup);
+  }
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactCompositeComponent);
@@ -10735,7 +10791,7 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/**
+/* WEBPACK VAR INJECTION */(function($) {/**
  * component 类
  * 文本类型
  * @param {*} text 文本内容
@@ -10755,7 +10811,20 @@ ReactDOMTextComponent.prototype.mountComponent = function (rootID) {
   return `<span data-reactid="${this._rootNodeID}">${this._currentElement}</span>`;
 };
 
+/**
+ * component 类 更新
+ * @param {*} newText
+ */
+ReactDOMTextComponent.prototype.receiveComponent = function (newText) {
+  var newStringText = "" + newText;
+  if (newStringText !== this._currentElement) {
+    this._currentElement = newStringText;
+    $(`data-reactid="${this._rootNodeID}"`).html(this._currentElement);
+  }
+};
+
 /* harmony default export */ __webpack_exports__["default"] = (ReactDOMTextComponent);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js")))
 
 /***/ }),
 
@@ -10854,6 +10923,40 @@ var root = document.getElementById("container");
 _React__WEBPACK_IMPORTED_MODULE_0__["default"].render(CompositeElement, root);
 
 /* harmony default export */ __webpack_exports__["default"] = (_React__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+/***/ }),
+
+/***/ "./react/util/_shouldUpdateReactComponent.js":
+/*!***************************************************!*\
+  !*** ./react/util/_shouldUpdateReactComponent.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * 通过比较两个元素，判断是否需要更新
+ * @param {*} preElement  旧的元素
+ * @param {*} nextElement 新的元素
+ * @return {boolean}
+ */
+function _shouldUpdateReactComponent(preElement, nextElement) {
+  if (!preElement && !nextElement) {
+    var preType = typeof preElement;
+    var nextType = typeof nextElement;
+    if (preType === "string" || preType === "number") {
+      // 如果新旧元素都为文本元素，则需要更新
+      return nextType === "string" && nextType === "number";
+    } else {
+      // 如果新旧元素的 type 和 key 都相等，则需要更新
+      return nextType === "object" && preElement.type === nextElement.type && preElement.key === nextElement.key;
+    }
+  }
+  return false;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (_shouldUpdateReactComponent);
 
 /***/ }),
 
