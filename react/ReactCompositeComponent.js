@@ -1,4 +1,5 @@
 import instantiateReactComponent from "./util/instantiateReactComponent";
+import _shouldUpdateReactComponent from "./util/_shouldUpdateReactComponent";
 
 /**
  * component 类
@@ -49,6 +50,61 @@ ReactCompositeComponent.prototype.mountComponent = function(rootID) {
     inst.componentDidMount && inst.componentDidMount();
   });
   return renderedMarkup;
+};
+
+/**
+ * component 类 更新
+ * @param {*} nextElement
+ * @param {*} newState
+ */
+ReactCompositeComponent.prototype.receiveComponent = function(
+  nextElement,
+  newState
+) {
+  // 如果接受了新的element，则直接使用最新的element
+  this._currentElement = nextElement || this._currentElement;
+
+  var inst = this._instance;
+
+  // 合并state
+  var nextState = { ...inst.state, newState };
+  var nextProps = this._currentElement.props;
+
+  // 更新state
+  inst.state = nextState;
+
+  // 生命周期方法
+  if (
+    inst.shouldComponentUpdate &&
+    inst.shouldComponentUpdate(nextProps, nextState) === false
+  ) {
+    // 如果实例的 shouldComponentUpdate 返回 false，则不需要继续往下执行更新
+    return;
+  }
+
+  // 生命周期方法
+  inst.componentWillUpdate && inst.componentWillUpdate(nextProps, nextState);
+
+  // 获取老的element
+  var preComponentInstance = this._renderedComponent;
+  var preRenderedElement = preComponentInstance._currentElement;
+
+  // 通过重新render 获取新的element
+  var nextRenderedElement = this._instance.render();
+
+  // 比较新旧元素
+  if (_shouldUpdateReactComponent(preRenderedElement, nextRenderedElement)) {
+    // 两种元素为相同，需要更新，执行字节点更新
+    preComponentInstance.receiveComponent(nextRenderedElement);
+    // 生命周期方法
+    inst.componentDidUpdate && inst.componentDidUpdate();
+  } else {
+    // 两种元素的类型不同，直接重新装载dom
+    var thisID = this._rootNodeID;
+    this._renderedComponent = instantiateReactComponent(nextRenderedElement);
+    var renderedMarkup = this._renderedComponent.mountComponent(thisID);
+    $(`[data-reactid="${thisID}"`).replaceWith(renderedMarkup);
+  }
 };
 
 export default ReactCompositeComponent;
