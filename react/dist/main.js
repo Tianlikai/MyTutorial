@@ -10718,7 +10718,11 @@ ReactCompositeComponent.prototype.receiveComponent = function (nextElement, newS
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/instantiateReactComponent */ "./react/util/instantiateReactComponent.js");
+/* WEBPACK VAR INJECTION */(function($) {/* harmony import */ var _util_flattenChildren__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util/flattenChildren */ "./react/util/flattenChildren.js");
+/* harmony import */ var _util_generateComponentChildren__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/generateComponentChildren */ "./react/util/generateComponentChildren.js");
+/* harmony import */ var _util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util/instantiateReactComponent */ "./react/util/instantiateReactComponent.js");
+
+
 
 
 /**
@@ -10764,7 +10768,7 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
   var childrenInstance = []; // 保存子节点component 实例
 
   children.forEach((child, key) => {
-    var childComponentInstance = Object(_util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_0__["default"])(child);
+    var childComponentInstance = Object(_util_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_2__["default"])(child);
     // 为子节点添加标记
     childComponentInstance._mountIndex = key;
     childrenInstance.push(childComponentInstance);
@@ -10774,7 +10778,117 @@ ReactDOMComponent.prototype.mountComponent = function (rootID) {
     // 拼接子节点dom
     content += childMarkup;
   });
+
+  // 保存component 实例
+  this._renderedChildren = childrenInstance;
+
   return tagOpen + ">" + content + tagClose;
+};
+
+/**
+ * component 类 更新
+ * @param {*} nextElement
+ */
+ReactDOMComponent.prototype.receiveComponent = function (nextElement) {
+  var lastProps = this._currentElement.props;
+  var nextProps = nextElement.props;
+  this._currentElement = nextElement;
+  // 处理当前节点的属性
+  this._updateDOMProperties(lastProps, nextProps);
+  // 处理当前节点的子节点变动
+  this._updateDOMChildren(nextElement.props.children);
+};
+
+/**
+ *
+ * @param {*} lastProps
+ * @param {*} nextProps
+ */
+ReactDOMComponent.prototype._updateDOMProperties = function (lastProps, nextProps) {
+  // 当老属性不在新属性的集合里时，需要删除属性
+  var propName;
+  for (propName in lastProps) {
+    if (nextProps.hasOwnProperty(propName) && !lastProps.hasOwnProperty(propName)) {
+      // 新属性中有，且不再老属性的原型中
+      continue;
+    }
+    if (/^on[A-Za-z]/.test(propName)) {
+      var eventType = propName.replace("on", "");
+      // 特殊事件，需要去掉事件监听
+      $(document).undelegate(`[data-reactid="${this._rootNodeID}"]`, eventType, lastProps[propName]);
+      continue;
+    }
+    // 删除不需要的属性
+    $(`[data-reactid="${this._rootNodeID}"]`).removeAttr(propName);
+  }
+  // 对于新的事件，需要写到dom上
+  for (propName in nextProps) {
+    if (propName === "children") continue;
+
+    if (/^on[A-Za-z]/.test(propName)) {
+      var eventType = propName.replace("on", "");
+      // 删除老的事件绑定
+      lastProps[propName] && $(document).undelegate(`[data-reactid="${this._rootNodeID}"]`, eventType, lastProps[propName]);
+      // 重新绑定
+      $(document).delegate(`[data-reactid="${this._rootNodeID}"]`, eventType, nextProps[propName]);
+      continue;
+    }
+
+    // 添加新的属性，重写同名属性
+    $(`[data-reactid="${this._rootNodeID}"]`).prop(propName, nextProps[propName]);
+  }
+};
+
+// 全局的更新深度标识
+var updateDepth = 0;
+// 全局的更新队列，所有的差异都存在这里
+var diffQueue = [];
+
+//差异更新的几种类型
+var UPDATE_TYPES = {
+  MOVE_EXISTING: 1,
+  REMOVE_NODE: 2,
+  INSERT_MARKUP: 3
+};
+
+/**
+ * 更新children
+ * @param {*} nextChildrenElements
+ */
+ReactDOMComponent.prototype._updateDOMChildren = function (nextChildrenElements) {
+  updateDepth++;
+  this._diff(diffQueue, nextChildrenElements);
+  updateDepth--;
+  if (updateDepth === 0) {
+    this._patch(diffQueue);
+    diffQueue = [];
+  }
+};
+
+/**
+ * _diff用来递归找出差别,组装差异对象,添加到更新队列diffQueue。
+ * @param {*} diffQueue
+ * @param {*} nextChildrenElements
+ */
+ReactDOMComponent.prototype._diff = function (diffQueue, nextChildrenElements) {
+  var self = this;
+
+  // 将之前保存的子节点 component实例数组 转换为映射
+  var prevChildren = Object(_util_flattenChildren__WEBPACK_IMPORTED_MODULE_0__["default"])(self._renderedChildren);
+
+  // 生成新的子节点 component 实例映射
+  var nextChildren = Object(_util_generateComponentChildren__WEBPACK_IMPORTED_MODULE_1__["default"])(prevChildren, nextChildrenElements);
+
+  // 重新赋值 _renderedChildren，使用最新的
+  self._renderedChildren = [];
+  for (let instance of nextChildren) {
+    self._renderedChildren.push(instance);
+  }
+
+  // 到达的新的节点的index
+  var nextIndex = 0;
+
+  // 比较两个集合的差异
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (ReactDOMComponent);
@@ -10957,6 +11071,86 @@ function _shouldUpdateReactComponent(preElement, nextElement) {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (_shouldUpdateReactComponent);
+
+/***/ }),
+
+/***/ "./react/util/flattenChildren.js":
+/*!***************************************!*\
+  !*** ./react/util/flattenChildren.js ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/**
+ * 将数组转换为映射
+ * @param {Array} componentChildren
+ * @return {object} 返回一个映射
+ */
+function flattenChildren(componentChildren) {
+  var name;
+  var childMap = {};
+  componentChildren && componentChildren.forEach((child, i) => {
+    // 一个组件下的子节点没有给定key值，则去下标作为标识
+    name = child && child._currentElement && child._currentElement.key ? child._currentElement.key : i.toString(32);
+    childMap[name] = child;
+  });
+  return childMap;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (flattenChildren);
+
+/***/ }),
+
+/***/ "./react/util/generateComponentChildren.js":
+/*!*************************************************!*\
+  !*** ./react/util/generateComponentChildren.js ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _shouldUpdateReactComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./_shouldUpdateReactComponent */ "./react/util/_shouldUpdateReactComponent.js");
+/* harmony import */ var _instantiateReactComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./instantiateReactComponent */ "./react/util/instantiateReactComponent.js");
+
+
+
+/**
+ * 生成子节点 elements 的 component 集合
+ * @param {object} prevChildren 前一个 component 集合
+ * @param {Array} nextChildrenElements 新传入的子节点element数组
+ * @return {object} 返回一个映射
+ */
+function generateComponentChildren(prevChildren, nextChildrenElements) {
+  // component 映射
+  var nextChildren = {};
+
+  nextChildrenElements = nextChildrenElements || [];
+  nextChildrenElements.forEach((element, i) => {
+    var name = element.key ? element.key : i;
+
+    var prevChild = prevChildren[name];
+    var prevElement = prevChild && prevChild._currentElement;
+
+    var nextElement = element;
+
+    // 判断新元素是否需要更新
+    if (Object(_shouldUpdateReactComponent__WEBPACK_IMPORTED_MODULE_0__["default"])(prevElement, nextElement)) {
+      // 更新的话直接递归调用子节点的receiveComponent就好了
+      prevChild.receiveComponent(nextElement);
+      nextChildren[name] = prevChild;
+    } else {
+      // 对于全新的元素，重新生成一个component
+      var nextChildrenInstance = Object(_instantiateReactComponent__WEBPACK_IMPORTED_MODULE_1__["default"])(nextElement);
+      nextChildren[name] = nextChildrenInstance;
+    }
+  });
+  return nextChildren;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (generateComponentChildren);
 
 /***/ }),
 
