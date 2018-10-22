@@ -49,7 +49,7 @@ var CompositeComponent = React.createClass({
     const count = this.state.count;
     var h3 = React.createElement(
       "h3",
-      { onclick: this.onChange.bind(this), class: 'h3' },
+      { onclick: this.onChange.bind(this), class: "h3" },
       `click me ${count}`
     );
     var children = [h3];
