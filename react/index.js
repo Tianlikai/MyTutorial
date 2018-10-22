@@ -30,7 +30,7 @@ import React from "./React";
 var CompositeComponent = React.createClass({
   getInitialState: function() {
     return {
-      items: []
+      count: 0
     };
   },
   componentWillMount: function() {
@@ -39,19 +39,26 @@ var CompositeComponent = React.createClass({
   componentDidMount: function() {
     console.log("声明周期: " + "componentDidMount");
   },
+  onChange: function(e) {
+    var count = ++this.state.count;
+    this.setState({
+      count: count
+    });
+  },
   render: function() {
-    var h1 = React.createElement("h1", null, "hello world!");
-    var h2 = React.createElement("h2", null, "this is React");
-    var children = [h1, h2];
+    const count = this.state.count;
+    var h3 = React.createElement(
+      "h3",
+      { onclick: this.onChange.bind(this), class: 'h3' },
+      `click me ${count}`
+    );
+    var children = [h3];
 
     return React.createElement("div", null, children);
   }
 });
 
-var CompositeElement = React.createElement(CompositeComponent, {
-  name: "jason",
-  age: 22
-});
+var CompositeElement = React.createElement(CompositeComponent);
 
 var root = document.getElementById("container");
 

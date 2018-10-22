@@ -34,8 +34,8 @@ ReactDOMComponent.prototype.mountComponent = function(rootID) {
       var eventType = propName.replace("on", "");
       // 对当前节点添加事件代理
       $(document).delegate(
-        `[data-reactid="${this._rootNodeID}"]`,
-        `${eventType}.${this._rootNodeID}`,
+        '[data-reactid="' + this._rootNodeID + '"]',
+        eventType + "." + this._rootNodeID,
         props[propName]
       );
     }
@@ -111,7 +111,7 @@ ReactDOMComponent.prototype._updateDOMProperties = function(
       var eventType = propName.replace("on", "");
       // 特殊事件，需要去掉事件监听
       $(document).undelegate(
-        `[data-reactid="${this._rootNodeID}"]`,
+        '[data-reactid="' + this._rootNodeID + '"]',
         eventType,
         lastProps[propName]
       );
@@ -128,17 +128,17 @@ ReactDOMComponent.prototype._updateDOMProperties = function(
       var eventType = propName.replace("on", "");
       // 删除老的事件绑定
       lastProps[propName] &&
-        $(document).undelegate(
-          `[data-reactid="${this._rootNodeID}"]`,
-          eventType,
-          lastProps[propName]
-        );
-      // 重新绑定
-      $(document).delegate(
-        `[data-reactid="${this._rootNodeID}"]`,
+      $(document).undelegate(
+        '[data-reactid="' + this._rootNodeID + '"]',
         eventType,
-        nextProps[propName]
+        lastProps[propName]
       );
+    //针对当前的节点添加事件代理,以_rootNodeID为命名空间
+    $(document).delegate(
+      '[data-reactid="' + this._rootNodeID + '"]',
+      eventType + "." + this._rootNodeID,
+      nextProps[propName]
+    );
       continue;
     }
 
@@ -259,7 +259,7 @@ ReactDOMComponent.prototype._diff = function(diffQueue, nextChildrenElements) {
         fromIndex: prevChildren[name]._mountIndex,
         toIndex: null
       });
-      //如果以前已经渲染过了，记得先去掉以前所有的事件监听
+      // 如果以前已经渲染过了，记得先去掉以前所有的事件监听
       if (prevChildren[name]._rootNodeID) {
         $(document).undelegate("." + prevChildren[name]._rootNodeID);
       }
