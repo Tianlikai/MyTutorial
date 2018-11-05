@@ -10492,10 +10492,10 @@ const React = {
    */
   createClass: function (spec) {
     // 定义一个子类
-    function Constructor(props) {
+    var Constructor = function (props) {
       this.props = props;
       this.state = this.getInitialState ? this.getInitialState() : null;
-    }
+    };
     // 原型继承，继承超父类
     Constructor.prototype = new _ReactClass__WEBPACK_IMPORTED_MODULE_0__["default"]();
     Constructor.prototype.constructor = Constructor;
@@ -11146,7 +11146,7 @@ var CompositeComponent = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createCl
   },
   render: function () {
     const count = this.state.count;
-    var h3 = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("h3", { onclick: this.onChange.bind(this), class: 'h3' }, `click me ${count}`);
+    var h3 = _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("h3", { onclick: this.onChange.bind(this), class: "h3" }, `click me ${count}`);
     var children = [h3];
 
     return _React__WEBPACK_IMPORTED_MODULE_0__["default"].createElement("div", null, children);

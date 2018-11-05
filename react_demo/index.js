@@ -445,6 +445,7 @@ ReactCompositeComponent.prototype.receiveComponent = function(
   nextElement,
   newState
 ) {
+  debugger
   //如果接受了新的，就使用最新的element
   this._currentElement = nextElement || this._currentElement;
 

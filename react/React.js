@@ -16,10 +16,10 @@ const React = {
    */
   createClass: function(spec) {
     // 定义一个子类
-    function Constructor(props) {
+    var Constructor = function(props) {
       this.props = props;
       this.state = this.getInitialState ? this.getInitialState() : null;
-    }
+    };
     // 原型继承，继承超父类
     Constructor.prototype = new ReactClass();
     Constructor.prototype.constructor = Constructor;
