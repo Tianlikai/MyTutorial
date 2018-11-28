@@ -1,50 +1,44 @@
-var a = 1539683760377
-var b = new Date().getTime()
-var c = a - b
-console.log(c)
+var MyModules = (function manager() {
+  var modules = {};
 
+  function define(name, deps, impl) {
+    for (var i = 0; i < deps.length; ++i) {
+      deps[i] = modules[deps[i]];
+    }
+    modules[name] = impl.apply(impl, deps);
+  }
 
-weShare = data => {
-    let params = { title: '论答商务合作', imgUrl: imgUrl, ...data }
-    G.wechatShare(params)
-}
+  function get(name) {
+    return modules[name];
+  }
+  return {
+    define,
+    get
+  };
+})();
 
+MyModules.define("bar", [], function() {
+  function hi(who) {
+    console.log(`hi: ${who}`);
+  }
 
-componentDidMount() {
-    const { pathname } = window.location
-    const link
-        = __TARGET__ === 'dev'
-            ? `https://demo.learnta.cn/bd${pathname}`
-            : `https://learnta.cn/bd${pathname}`
-    this.weShare({
-        desc: link,
-        link: link
-    })
-}
+  return {
+    hi
+  };
+});
 
+MyModules.define("foo", ["bar"], function() {
+  function goodbye(hi, goodbye) {
+    bar.hi(hi);
+    console.log(`goodbye: ${goodbye}`);
+  }
 
+  return {
+    goodbye
+  };
+});
 
+var bar = MyModules.get("bar");
+var foo = MyModules.get("foo");
 
-const { pathname } = window.location
-const linkWeShare
-    = __TARGET__ === 'dev'
-        ? `https://demo.learnta.cn/bd${pathname}`
-        : `https://learnta.cn/bd${pathname}`
-this.weShare({
-    desc: manualTitle,
-    link: linkWeShare
-})
-
-
-componentDidMount() {
-    const { query, id, app } = this.getUrlParams(this.props)
-    this.props[store].searchManuals(id, query, app)
-    const link
-        = __TARGET__ === 'dev'
-            ? 'https://demo.learnta.cn/bd/outer/detail'
-            : 'https://learnta.cn/outer/detail'
-    this.weShare({
-        desc: link,
-        link: link
-    })
-}
+foo.goodbye("tony", "tom");
