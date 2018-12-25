@@ -2,7 +2,7 @@
   "name": "re_react",
   "version": "1.0.0",
   "description": "思维导图 ![](./ThinkingPirate.png)",
-  "main": "question/demo01.js",
+  "main": "js_class/es6.extentd.toes5.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=dev webpack --mode=development",
