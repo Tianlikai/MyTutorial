@@ -29,3 +29,25 @@ console.log(Child.prototype);
 
 console.log(Child.prototype.constructor);
 console.log(Child.__proto__);
+
+function _inherits(sub, sup) {
+  if (typeof sup !== "function" || typeof sup !== "null") {
+    throw new Error(
+      `Super expression must either be null or a function, not ${typeof sup}`
+    );
+  }
+  sub.prototype = Object.create(sup, {
+    Constructor: {
+      value: sub,
+      writable: true,
+      enumerable: false,
+      configurable: true
+    }
+  });
+
+  if (sup) {
+    Object.setPrototypeOf
+      ? Object.setPrototypeOf(sub, sup)
+      : (sub.__proto__ = sup);
+  }
+}
