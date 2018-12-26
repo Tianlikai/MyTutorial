@@ -5,9 +5,15 @@ class Parent {
   constructor(name) {
     this.name = name;
   }
+  /**
+   * 静态方法，通过 Parent 调用
+   */
   static getMe() {
     console.log("this is super");
   }
+  /**
+   * 公共方法，在 prototype 上
+   */
   getName() {
     console.log(this.name);
   }

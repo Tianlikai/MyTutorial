@@ -1,8 +1,11 @@
 "use strict";
 
 /**
- * 立即执行函数
- * 生成独立作用域
+ * 立即执行闭包
+ * @param {*} Constructor 构造函数
+ * @param {*} protoProps 原型属性
+ * @param {*} staticProps 静态属性
+ * @return {function}
  */
 var _createClass = (function() {
   /**
@@ -25,9 +28,9 @@ var _createClass = (function() {
    * @param {array} staticProps 静态属性
    */
   return function(Constructor, protoProps, staticProps) {
-    // 原型上属性
+    // 原型上属性, 添加到Constructor 的原型上
     if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    // 类上的属性
+    // 类上的属性, 添加到Constructor 类上
     if (staticProps) defineProperties(Constructor, staticProps);
     return Constructor;
   };
@@ -52,8 +55,8 @@ function _classCallCheck(instance, Constructor) {
 }
 
 /**
- * 立即执行函数
- * 生成独立作用域
+ * 立即执行闭包
+ * @return {function}
  */
 var Parent = (function() {
   function Parent(name) {

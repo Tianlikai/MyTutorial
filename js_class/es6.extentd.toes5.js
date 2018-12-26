@@ -17,6 +17,9 @@ var _createClass = (function() {
   };
 })();
 
+/**
+ * 调用父类的 Constructor 构造函数
+ */
 function _possibleConstructorReturn(self, call) {
   if (!self) {
     throw new ReferenceError(
@@ -41,6 +44,13 @@ function _inherits(subClass, superClass) {
         typeof superClass
     );
   }
+
+  /**
+   * Object.create 接受两个参数
+   * 指定原型创建对象
+   * @param {*} 目标原型
+   * @param {*} 添加属性
+   */
   subClass.prototype = Object.create(superClass && superClass.prototype, {
     constructor: {
       value: subClass, // subClass.prototype.constructor 指向 subClass
@@ -49,11 +59,19 @@ function _inherits(subClass, superClass) {
       configurable: true
     }
   });
-  //   if (superClass)
-  //     // 设置子类的__proto__
-  //     Object.setPrototypeOf
-  //       ? Object.setPrototypeOf(subClass, superClass)
-  //       : (subClass.__proto__ = superClass);
+
+  /**
+   * Object.setPrototypeOf 方法
+   * 设置子类的 __proto__ 属性指向父类
+   * @param {*} 子类
+   * @param {*} 父类
+   */
+  if (superClass) {
+    // 设置子类的__proto__ 让 Child 能访问父类静态属性
+    Object.setPrototypeOf
+      ? Object.setPrototypeOf(subClass, superClass)
+      : (subClass.__proto__ = superClass);
+  }
 }
 
 /**
@@ -104,15 +122,21 @@ var Parent = (function() {
   return Parent;
 })();
 
+/**
+ * @param {*} _Parent 传入父类
+ */
 var Child = (function(_Parent) {
   _inherits(Child, _Parent);
 
   function Child(name, age) {
     _classCallCheck(this, Child);
 
+    /**
+     * 调用父类的 Constructor 构造函数
+     */
     var _this = _possibleConstructorReturn(
       this,
-      (Child.__proto__ || Object.getPrototypeOf(Child)).call(this, name)
+      (Child.__proto__ || Object.getPrototypeOf(Child)).call(this, name) // 调用父类Constructor
     );
 
     _this.age = age;
@@ -139,5 +163,3 @@ console.log(Child.prototype);
 
 console.log(Child.prototype.constructor);
 console.log(Child.__proto__);
-
-Child.getMe();
