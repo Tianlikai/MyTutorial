@@ -1,3 +1,0 @@
-(function(Window, undefined){
-
-})(Window)
