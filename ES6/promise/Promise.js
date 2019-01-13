@@ -69,7 +69,15 @@ function resolvePromise(promise2, x, resolve, reject) {
         // promise 相互之间的交互
         // 自己写的promise 和 别人写的promise
         // 考虑兼容性
-        then.call(this, function(y) {}, function(error) {});
+        then.call(
+          this,
+          function(y) {
+            resolvePromise(promise2, y, resolve, reject);
+          },
+          function(error) {
+            reject(error);
+          }
+        );
       } else {
         // x 不是一个 thenable 对象 resolve promise2
         // 当作值resolve
@@ -144,6 +152,5 @@ MyPromise.prototype.then = function(onFulfilled, onRejected) {
     });
   }
 };
-module.exports = MyPromise;
 
-let a = new MyPromise();
+module.exports = MyPromise;
