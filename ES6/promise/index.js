@@ -25,11 +25,30 @@ let promise1 = new Promise2(function(resolve, reject) {
  * 第一个函数是成功回调
  * 第而个函数是失败回调
  */
-let promise2 = promise1.then(
-  function(resp) {
-    console.log(resp);
-  },
-  function(reason) {
-    console.log(reason);
-  }
-);
+let promise2 = promise1
+  .then(
+    function(resp) {
+      // 成功回调
+      // 这里也可以是一个 promise
+      console.log(resp);
+      throw new Error("成功回调出错啦");
+    },
+    function(reason) {
+      console.log(reason);
+    }
+  )
+  .then(
+    function(resp) {
+      console.log(resp);
+    },
+    function(error) {
+      console.log(error);
+    }
+  );
+
+let promise3 = p1.then(function(data) {
+  console.log(data);
+  // 等待promise3自己完成，永远不会完成
+  // 将会一直等待
+  return promise3;
+});
