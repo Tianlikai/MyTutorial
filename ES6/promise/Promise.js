@@ -18,7 +18,7 @@ function MyPromise(executor) {
       if (self.status === PENDING) {
         self.status = FULFILLED;
         self.value = value;
-        self.onResolveCallbacks.foreach(function(cb) {
+        self.onResolveCallbacks.forEach(function(cb) {
           cb(self.value);
         });
       }
@@ -30,7 +30,7 @@ function MyPromise(executor) {
       if (self.status === PENDING) {
         self.status = REJECTED;
         self.value = reason;
-        self.onRejectCallbacks.foreach(function(cb) {
+        self.onRejectCallbacks.forEach(function(cb) {
           cb(self.value);
         });
       }
