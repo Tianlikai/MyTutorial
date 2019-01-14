@@ -2,48 +2,6 @@ const PENDING = "pending";
 const FULFILLED = "fulfilled";
 const REJECTED = "rejected";
 
-function MyPromise(executor) {
-  const self = this;
-  self.status = PENDING;
-
-  self.onResolveCallbacks = [];
-  self.onRejectCallbacks = [];
-
-  function resolve(value) {
-    if (value instanceof MyPromise) {
-      return value.then(resolve, reject);
-    }
-
-    setTimeout(function() {
-      if (self.status === PENDING) {
-        self.status = FULFILLED;
-        self.value = value;
-        self.onResolveCallbacks.forEach(function(cb) {
-          cb(self.value);
-        });
-      }
-    });
-  }
-
-  function reject(reason) {
-    setTimeout(function() {
-      if (self.status === PENDING) {
-        self.status = REJECTED;
-        self.value = reason;
-        self.onRejectCallbacks.forEach(function(cb) {
-          cb(self.value);
-        });
-      }
-    });
-  }
-
-  try {
-    executor(resolve, reject);
-  } catch (error) {
-    reject(error);
-  }
-}
-
 function resolvePromise(promise2, x, resolve, reject) {
   if (promise2 === x) return reject(new TypeError("循环引用"));
 
@@ -83,6 +41,58 @@ function resolvePromise(promise2, x, resolve, reject) {
     }
   } else {
     resolve(x);
+  }
+}
+
+function gen(times, cb) {
+  let result = [];
+  let count = 0;
+  return function(i, value) {
+    result[i] = value;
+    count += 1;
+    if (count === times) cb(result);
+  };
+}
+
+function MyPromise(executor) {
+  const self = this;
+  self.status = PENDING;
+
+  self.onResolveCallbacks = [];
+  self.onRejectCallbacks = [];
+
+  function resolve(value) {
+    if (value instanceof MyPromise) {
+      return value.then(resolve, reject);
+    }
+
+    setTimeout(function() {
+      if (self.status === PENDING) {
+        self.status = FULFILLED;
+        self.value = value;
+        self.onResolveCallbacks.forEach(function(cb) {
+          cb(self.value);
+        });
+      }
+    });
+  }
+
+  function reject(reason) {
+    setTimeout(function() {
+      if (self.status === PENDING) {
+        self.status = REJECTED;
+        self.value = reason;
+        self.onRejectCallbacks.forEach(function(cb) {
+          cb(self.value);
+        });
+      }
+    });
+  }
+
+  try {
+    executor(resolve, reject);
+  } catch (error) {
+    reject(error);
   }
 }
 
@@ -146,6 +156,25 @@ MyPromise.prototype.then = function(onFulfilled, onRejected) {
       });
     }));
   }
+};
+
+MyPromise.all = function(promises) {
+  return new MyPromise(function(resolve, reject) {
+    const done = gen(promises.length, resolve);
+    for (let i = 0; i < promises.length; i += 1) {
+      promises[i].then(function(value) {
+        done(i, value);
+      }, reject);
+    }
+  });
+};
+
+MyPromise.race = function(promises) {
+  return new MyPromise(function(resolve, reject) {
+    for (let i = 0; i < promises.length; i += 1) {
+      promises[i].then(resolve, reject);
+    }
+  });
 };
 
 MyPromise.prototype.catch = function(onRejected) {
