@@ -4,7 +4,7 @@
   "description": "## 前言",
   "main": "index.js",
   "scripts": {
-    "test": "promises-aplus-tests Promise2.js"
+    "test": "promises-aplus-tests Promise.js"
   },
   "author": "",
   "license": "ISC",

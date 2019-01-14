@@ -79,7 +79,7 @@ function resolvePromise(promise2, x, resolve, reject) {
     } catch (error) {
       if (called) return;
       called = true;
-      reject(x);
+      reject(error);
     }
   } else {
     resolve(x);

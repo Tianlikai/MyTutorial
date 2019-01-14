@@ -1,4 +1,4 @@
-let Promise2 = require("./Promise2");
+let Promise2 = require("./Promise");
 
 /**
  * 传入 Promise 的执行器 立即执行
