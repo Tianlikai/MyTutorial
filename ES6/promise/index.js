@@ -40,3 +40,5 @@ p3.then(
     console.log(reason);
   }
 );
+
+p1.then(function() {}, function() {}).then(function() {}, function() {});
