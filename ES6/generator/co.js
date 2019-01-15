@@ -1,25 +1,17 @@
-const fs = require("fs");
-const co = require("co");
-
-function readFile(filename) {
+function co(gen) {
+  let it = gen();
   return new Promise(function(resolve, reject) {
-    fs.readFile(filename, "utf-8", function(error, data) {
-      if (error) reject(error);
-      resolve(data);
-    });
+    (function next(lastVal) {
+      // next方法可以带一个参数
+      // 该参数就会被当作上一个yield表达式的返回值。
+      let { value, done } = it.next(lastVal);
+      if (done) {
+        resolve(value);
+      } else {
+        value.then(next, reject);
+      }
+    })();
   });
 }
 
-function* read() {
-  let a = yield readFile("1.txt");
-  let b = yield readFile("2.txt");
-  let c = yield readFile("3.txt");
-}
-
-co(read);
-
-let resp = read();
-console.log(resp.next());
-console.log(resp.next());
-console.log(resp.next());
-console.log(resp.next());
+module.exports = co;
