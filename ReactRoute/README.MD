@@ -1,0 +1,70 @@
+## loader
+
+loader 从右往左执行
+
+- css-loader 将 css 文件变成一个模块
+- style-loader 将 css 文件插入 header 中
+
+### sass-loader
+
+必须结合 node-sass 使用
+
+### postcss-loader
+
+### file-loader
+
+解析图片地址，并且把图片从源位置拷贝到目标位置
+
+```
+        use: {
+          loader: "file-loader",
+          options: {
+            outputPath: "images/" // 设置输出路径
+          }
+        }
+```
+
+### url-loader
+
+当文件较小时，使用 base64 将文件内嵌到 html 中
+
+```
+        use: {
+          loader: "url-loader",
+          options: {
+            limit: 1024, // 设置是否转换 base64 分解线
+            outputPath: "images/"
+          }
+        }
+```
+
+## module
+
+### webpack.ProvidePlugin
+
+自动往模块注入变量
+
+### clean-webpack-plugin
+
+每次打包清除指定目录
+
+### html-webpack-plugin html 模版
+
+- template 指定产出的模版
+- filename 指定产出的文件
+- title 设置 html 中 header 中的 title
+- hash 添加 hash 避免缓存
+- inject 是否指定插入 script 标签
+
+### extract-text-webpack-plugin
+
+提取样式，单独生成文件
+
+## webpack-dev-server
+
+本地服务器，运行在内存中
+
+- contentBase 服务文件目录
+- compress 是否 gzip 压缩
+- port 设置端口
+- open 是否制动打开游览器

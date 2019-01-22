@@ -1,0 +1,16 @@
+# dependencies
+**/node_modules
+
+# production
+/dist
+/.vscode
+
+.idea
+yarn.lock
+package-lock.json
+*bak
+.vscode
+
+# visual studio code
+.history
+*.log
