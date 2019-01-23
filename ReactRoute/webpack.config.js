@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const devMode = process.env.NODE_ENV === "development";
 
@@ -14,24 +14,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(sa|sc|c)ss$/,
         use: [
-          { loader: "style-loader" },
+          { loader: devMode ? "style-loader" : MiniCssExtractPlugin.loader },
           { loader: "css-loader" },
-          {
-            loader: "postcss-loader"
-          }
-        ]
-      },
-      {
-        test: /\.s(a|c)ss$/,
-        use: [
-          { loader: "style-loader" },
-          { loader: "css-loader" },
-          { loader: "sass-loader" },
-          {
-            loader: "postcss-loader"
-          }
+          { loader: "postcss-loader" },
+          { loader: "sass-loader" }
         ]
       },
       {
@@ -52,6 +40,10 @@ module.exports = {
   },
   resolve: {},
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: devMode ? "[name].css" : "[name].[hash].css",
+      chunkFilename: devMode ? "[id].css" : "[id].[hash].css"
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "src/index.html"),
       filename: "index.html",
