@@ -40,6 +40,10 @@ loader 从右往左执行
 
 ## module
 
+### copy-webpack-plugin
+
+复制静态文件
+
 ### webpack.ProvidePlugin
 
 自动往模块注入变量
@@ -56,7 +60,9 @@ loader 从右往左执行
 - hash 添加 hash 避免缓存
 - inject 是否指定插入 script 标签
 
-### extract-text-webpack-plugin
+### mini-css-extract-plugin
+
+从 js 文件中抽离 css 创建单独文件
 
 提取样式，单独生成文件
 

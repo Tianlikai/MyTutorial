@@ -1,11 +1,6 @@
-const str = require("./demo01");
-require("./css.css");
-require("./scss.scss");
+import React from "react";
+import ReactDOM from "react-dom";
 
-const src = require("./images/me.png");
-const img = new Image();
-img.src = src;
+import App from "./App";
 
-document.body.appendChild(img);
-document.querySelector("#root").innerHTML = str;
-document.querySelector("#container").innerHTML = str;
+ReactDOM.render(<App />, document.querySelector("#root"));

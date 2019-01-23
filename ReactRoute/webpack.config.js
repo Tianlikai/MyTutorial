@@ -1,8 +1,8 @@
 const path = require("path");
 const webpack = require("webpack");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
 const devMode = process.env.NODE_ENV === "development";
 
 module.exports = {
@@ -13,6 +13,14 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.js/,
+        use: [
+          {
+            loader: "babel-loader"
+          }
+        ]
+      },
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
@@ -44,11 +52,20 @@ module.exports = {
       filename: devMode ? "[name].css" : "[name].[hash].css",
       chunkFilename: devMode ? "[id].css" : "[id].[hash].css"
     }),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, "static/name.json"),
+        to: ""
+      }
+    ]),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "src/index.html"),
       filename: "index.html",
       title: "demo",
-      hash: true
+      hash: true,
+      minify: {
+        removeAttributeQuotes: true
+      }
     })
   ],
   devServer: {
