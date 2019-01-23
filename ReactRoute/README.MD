@@ -1,3 +1,8 @@
+## resolve 
+
+- alias 配置别名
+- extensions 自动添加拓展名
+
 ## loader
 
 loader 从右往左执行
@@ -43,6 +48,14 @@ loader 从右往左执行
 ### copy-webpack-plugin
 
 复制静态文件
+
+### uglifyjs-webpack-plugin
+
+js 压缩
+
+### optimize-css-assets-webpack-plugin
+
+css 压缩
 
 ### webpack.ProvidePlugin
 
