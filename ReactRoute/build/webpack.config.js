@@ -13,8 +13,9 @@ const devMode = env.DevMode === "development";
 module.exports = {
   entry: path.resolve(__dirname, "../src/index.js"),
   output: {
-    filename: "[name].[hash:8].js",
-    path: path.resolve(__dirname, "../dist")
+    filename: devMode ? "[name].js" : "[name].[hash:8].js",
+    path: path.resolve(__dirname, "../dist"),
+    publicPath: devMode ? env.FRONTEND : ""
   },
   module: {
     rules: [
@@ -37,7 +38,8 @@ module.exports = {
           loader: "url-loader",
           options: {
             limit: 1024,
-            outputPath: "images/"
+            outputPath: "images/",
+            publicPath: devMode ? `${env.FRONTEND}/images/` : ""
           }
         }
       },
@@ -83,6 +85,9 @@ module.exports = {
     new webpack.DllReferencePlugin({
       manifest: path.resolve(__dirname, "../static/manifest.json")
     }),
+    new webpack.DefinePlugin({
+      __devMode__: env.DevMode
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "../src/index.html"),
       filename: "index.html",
@@ -95,8 +100,10 @@ module.exports = {
   ],
   devServer: {
     contentBase: path.resolve(__dirname, "../dist"),
+    historyApiFallback: true,
     compress: true, // 是否gzip压缩
-    port: 8080,
+    host: env.HOST,
+    port: env.PORT,
     open: true
   }
 };

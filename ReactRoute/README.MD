@@ -62,6 +62,10 @@ css 压缩
 
 自动往模块注入变量
 
+### webpack.DefinePlugin
+
+定义全局变量，依据当前开发环境，向系统区分插入该变量
+
 ### clean-webpack-plugin
 
 每次打包清除指定目录
