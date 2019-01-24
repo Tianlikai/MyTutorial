@@ -7,15 +7,14 @@ module.exports = {
     vendor: ["react", "react-dom"]
   },
   output: {
-    path: path.resolve(__dirname, "static"),
+    path: path.resolve(__dirname, "../static"),
     filename: "dll.[name].js",
     library: "dll_[name]_js"
   },
   plugins: [
     new webpack.DllPlugin({
-      context: __dirname,
       name: "dll_[name]_js",
-      path: path.resolve(__dirname, "static/manifest.json")
+      path: path.resolve(__dirname, "../static/manifest.json")
     })
   ]
 };

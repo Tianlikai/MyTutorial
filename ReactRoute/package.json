@@ -4,13 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "clear_dist": "rimraf dist",
-    "clear_dll": "rimraf static",
-    "clear": "npm run clear_dll && npm run clear_dist",
-    "build_dll": "npm run clear_dll && webpack --config webpack.dll.config.js --mode production",
-    "build_dev": "npm run clear_dist && cross-env NODE_ENV=development webpack --mode development",
-    "build": "npm run clear_dist && cross-env NODE_ENV=production webpack --mode production",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --mode development --devtool source-map"
+    "clear": "rimraf static && rimraf dist",
+    "build_dll": "rimraf static && webpack --config build/webpack.dll.config.js --mode production",
+    "build_dev": "rimraf dist && cross-env NODE_ENV=development webpack --config build/index.js --mode development",
+    "build": "rimraf dist && cross-env NODE_ENV=production webpack --config build/index.js  --mode production",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/index.js --mode development --devtool source-map"
   },
   "keywords": [],
   "author": "",

@@ -7,13 +7,14 @@ const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
-const devMode = process.env.NODE_ENV === "development";
+const env = require("./env");
+const devMode = env.DevMode === "development";
 
 module.exports = {
-  entry: path.resolve(__dirname, "src/index.js"),
+  entry: path.resolve(__dirname, "../src/index.js"),
   output: {
     filename: "[name].[hash:8].js",
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "../dist")
   },
   module: {
     rules: [
@@ -76,15 +77,14 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {
-        from: "./static/dll.vendor.*"
+        from: path.resolve(__dirname, "../static", "dll.vendor.*")
       }
     ]),
     new webpack.DllReferencePlugin({
-      context: __dirname,
-      manifest: path.resolve(__dirname, "static/manifest.json")
+      manifest: path.resolve(__dirname, "../static/manifest.json")
     }),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "src/index.html"),
+      template: path.resolve(__dirname, "../src/index.html"),
       filename: "index.html",
       title: "demo",
       hash: true,
@@ -94,7 +94,7 @@ module.exports = {
     })
   ],
   devServer: {
-    contentBase: path.resolve(__dirname, "dist"),
+    contentBase: path.resolve(__dirname, "../dist"),
     compress: true, // 是否gzip压缩
     port: 8080,
     open: true
