@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const HappyPack = require("happypack");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
@@ -20,19 +21,13 @@ module.exports = {
         test: /\.js/,
         include: path.resolve("src"),
         exclude: /(node_modules|bower_components)/,
-        use: [
-          {
-            loader: "babel-loader"
-          }
-        ]
+        use: ["happypack/loader?id=js"]
       },
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
           { loader: devMode ? "style-loader" : MiniCssExtractPlugin.loader },
-          { loader: "css-loader" },
-          { loader: "postcss-loader" },
-          { loader: "sass-loader" }
+          { loader: "happypack/loader?id=css" }
         ]
       },
       {
@@ -63,6 +58,18 @@ module.exports = {
   },
   resolve: {},
   plugins: [
+    new HappyPack({
+      id: "js",
+      loaders: ["babel-loader"]
+    }),
+    new HappyPack({
+      id: "css",
+      loaders: [
+        { loader: "css-loader" },
+        { loader: "postcss-loader" },
+        { loader: "sass-loader" }
+      ]
+    }),
     new MiniCssExtractPlugin({
       filename: devMode ? "[name].css" : "[name].[hash].css",
       chunkFilename: devMode ? "[id].css" : "[id].[hash].css"

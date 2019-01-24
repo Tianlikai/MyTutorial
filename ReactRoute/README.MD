@@ -89,6 +89,16 @@ css 压缩
 - port 设置端口
 - open 是否制动打开游览器
 
-## DLL
+## DLL 动态链接库
 
-动态链接库
+### webpack.dll.config.js
+
+输出 vendor.dll 文件，通过 webpack.DllPlugin 插件输出 manifest.json 映射文件
+
+### webpack.DllReferencePlugin
+
+webpack.config.js 使用该插件根据 manifest.json 映射文件引用公共库
+
+## happypack
+
+启用多线程打包
