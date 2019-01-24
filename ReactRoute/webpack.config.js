@@ -18,6 +18,8 @@ module.exports = {
     rules: [
       {
         test: /\.js/,
+        include: path.resolve("src"),
+        exclude: /(node_modules|bower_components)/,
         use: [
           {
             loader: "babel-loader"
@@ -67,10 +69,13 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {
-        from: path.resolve(__dirname, "static/name.json"),
-        to: ""
+        from: "./static/dll.vendor.*"
       }
     ]),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: path.resolve(__dirname, "static/manifest.json")
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "src/index.html"),
       filename: "index.html",

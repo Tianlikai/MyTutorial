@@ -1,7 +1,8 @@
-## resolve 
+## resolve
 
 - alias 配置别名
 - extensions 自动添加拓展名
+- modules ['node_modules', './lib'] 自动解析除 node_modules 以外的文件
 
 ## loader
 
@@ -87,3 +88,7 @@ css 压缩
 - compress 是否 gzip 压缩
 - port 设置端口
 - open 是否制动打开游览器
+
+## DLL
+
+动态链接库
