@@ -66,6 +66,24 @@ css 压缩
 
 定义全局变量，依据当前开发环境，向系统区分插入该变量
 
+### webpack.HotModuleReplacementPlugin
+
+- 配合 devServer 使用
+
+```
+  // 添加一下两项配置
+  devServer: {
+    inline: env.INLINE,
+    hot: env.HOT,
+  }
+```
+
+webpack 启动热更新
+
+### webpack.NamedModulesPlugin
+
+以 name 命名模块
+
 ### clean-webpack-plugin
 
 每次打包清除指定目录
@@ -106,3 +124,9 @@ webpack.config.js 使用该插件根据 manifest.json 映射文件引用公共�
 ## happypack
 
 启用多线程打包
+
+## 热更新原理
+
+事件冒泡机制
+
+子节点的父节点没有处理该事件，会一直冒泡到顶部游览器，到达游览器，游览器会刷新

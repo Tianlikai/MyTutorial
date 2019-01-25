@@ -17,6 +17,17 @@ module.exports = {
     path: path.resolve(__dirname, "../dist"),
     publicPath: devMode ? env.FRONTEND : ""
   },
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true
+      }),
+      new OptimizeCSSAssetsPlugin({})
+    ]
+  },
+  resolve: {},
   module: {
     rules: [
       {
@@ -49,17 +60,6 @@ module.exports = {
       }
     ]
   },
-  optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true
-      }),
-      new OptimizeCSSAssetsPlugin({})
-    ]
-  },
-  resolve: {},
   plugins: [
     new HappyPack({
       id: "js",
@@ -104,6 +104,8 @@ module.exports = {
     compress: true, // 是否gzip压缩
     host: env.HOST,
     port: env.PORT,
+    inline: env.INLINE,
+    hot: env.HOT,
     open: true
   }
 };

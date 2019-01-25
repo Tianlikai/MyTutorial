@@ -3,6 +3,8 @@ const PROTOCOL = "http";
 const HOST = getIpAddress();
 const PORT = 8080;
 const FRONTEND = `${PROTOCOL}://${HOST}:${PORT}/`;
+const INLINE = true;
+const HOT = true;
 
 const config = {
   VERSION,
@@ -10,6 +12,8 @@ const config = {
   HOST,
   PORT,
   FRONTEND,
+  INLINE,
+  HOT,
   DevMode: process.env.NODE_ENV
 };
 

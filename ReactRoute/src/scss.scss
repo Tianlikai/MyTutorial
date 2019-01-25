@@ -1,4 +1,6 @@
 .container {
-  color: aqua;
-  display: flex;
+  color: red;
+  .name {
+    margin-bottom: 10px;
+  }
 }
