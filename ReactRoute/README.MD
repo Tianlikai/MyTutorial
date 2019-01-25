@@ -125,6 +125,10 @@ webpack.config.js 使用该插件根据 manifest.json 映射文件引用公共�
 
 启用多线程打包
 
+## optimization
+
+- optimization.splitChunks 抽离公共模块
+
 ## 热更新原理
 
 事件冒泡机制

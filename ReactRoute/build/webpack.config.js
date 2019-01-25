@@ -11,13 +11,28 @@ const env = require("./env");
 const devMode = env.DevMode === "development";
 
 module.exports = {
-  entry: path.resolve(__dirname, "../src/index.js"),
+  entry: path.resolve(__dirname, "../src/test.js"),
   output: {
     filename: devMode ? "[name].js" : "[name].[hash:8].js",
     path: path.resolve(__dirname, "../dist"),
     publicPath: devMode ? env.FRONTEND : ""
   },
   optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          chunks: "all",
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendor"
+        },
+        common: {
+          chunks: "all",
+          test: /[\\/]src[\\/]/,
+          minChunks: 2,
+          name: "common"
+        }
+      }
+    },
     minimizer: [
       new UglifyJsPlugin({
         cache: true,

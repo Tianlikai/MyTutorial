@@ -3,4 +3,14 @@
   .name {
     margin-bottom: 10px;
   }
+  .btn {
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    width: 80px;
+    margin-bottom: 10px;
+    border: 1px solid red;
+    border-radius: 3px;
+    cursor: pointer;
+  }
 }

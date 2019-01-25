@@ -9,6 +9,7 @@ export default class App extends React.Component {
     return (
       <div className="container">
         <div className="name">{str}</div>
+        <div className="btn">click me</div>
         <img src={src} alt="logo" />
       </div>
     );

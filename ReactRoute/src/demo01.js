@@ -1,1 +1,5 @@
-module.exports = "jason man";
+function getName() {
+  return "jason";
+}
+
+export { getName };
