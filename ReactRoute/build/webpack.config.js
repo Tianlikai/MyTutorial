@@ -11,7 +11,7 @@ const env = require("./env");
 const devMode = env.DevMode === "development";
 
 module.exports = {
-  entry: path.resolve(__dirname, "../src/test.js"),
+  entry: path.resolve(__dirname, "../src/index.js"),
   output: {
     filename: devMode ? "[name].js" : "[name].[hash:8].js",
     path: path.resolve(__dirname, "../dist"),

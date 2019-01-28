@@ -7,6 +7,41 @@
 - 更新机制（setState）（批量更新）
 - diff 算法
 
+## 顶层 API
+
+### React.Component
+
+### React.PureComponent
+
+PureComponent 和 Component 相似，但是 PureComponent 实现了 shouldComponentUpdate() 周期的重写，在内部实现了一个关于 props 和 state 的牵比较。
+
+> ⚠️ PureComponent 的 shouldComponentUpdate 只是实现了对简单数据的比较，在面临嵌套的复杂数据结构时你可以用 immutable objects 来快速比较。
+> 而且必须确认 PureComponent 组件的子节点也是 PureComponent，应为 PureComponent 的 shouldComponentUpdate 会跳过所有自组件的 render
+
+### React.memo
+
+React.memo() 和 React.PureComponent 相似，但这是针对函数式组件的优化，同样在内部会做简单数据比较，而且会缓存上一次渲染结果，如果 props 和 state 不变这直接使用跳过渲染，并且该函数接受第二个参数，自定义的比较函数。
+
+### createElement()
+
+### createFactory()
+
+### cloneElement()
+
+### isValidElement()
+
+### React.Children
+
+### React.Fragment
+
+### React.createRef
+
+### React.forwardRef
+
+### React.lazy
+
+### React.Suspense
+
 ## 未实现类容
 
 - instantiateReactComponent 没有实现空类型处理

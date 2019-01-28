@@ -4,7 +4,7 @@ const webpack = require("webpack");
 module.exports = {
   mode: "production",
   entry: {
-    vendor: ["react", "react-dom"]
+    vendor: ["prop-types", "react", "react-dom", "react-router-dom"]
   },
   output: {
     path: path.resolve(__dirname, "../static"),
