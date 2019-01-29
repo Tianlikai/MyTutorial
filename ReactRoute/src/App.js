@@ -31,7 +31,7 @@ export default class App extends Component {
               <Link to="/manage">用户管理</Link>
             </li>
             <li>
-              <Link>个人设置</Link>
+              <Link to="/profile">个人设置</Link>
             </li>
           </ul>
         </div>

@@ -7,7 +7,22 @@ const A = props => {
   console.log(props);
   return <div>this is a </div>;
 };
+
 const B = () => <div>this is b </div>;
+
+class Demo extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: props.name
+    };
+  }
+
+  render() {
+    console.log(this.state.name);
+    return 123;
+  }
+}
 
 export default class Home extends Component {
   render() {
@@ -22,6 +37,7 @@ export default class Home extends Component {
           </li>
         </ul>
         <div>this is home</div>
+        <Demo name="jason" />
         <Route path="/home/a/:id" component={A} />
         <Route path="/home/b" component={B} />
       </div>

@@ -15,20 +15,36 @@ export default class Route extends Component {
   constructor(props) {
     super(props);
     const { path } = props;
-    this.keys = [];
-    this.regexp = PathToRegexp(path, this.keys, { end: false });
-    this.keys = this.keys.map(key => key.name);
+    this.state = {
+      path: "",
+      keys: [],
+      regexp: null
+    };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.path !== state.path) {
+      let keys = [];
+      return {
+        path: props.path,
+        regexp: PathToRegexp(props.path, keys, { end: false }),
+        keys: keys.map(key => key.name)
+      };
+    }
+    return null;
   }
 
   render() {
-    const { path, component: Component } = this.props;
+    const { component: Component } = this.props;
     const { location, history } = this.context;
     const { pathname } = location;
 
-    let result = pathname.match(this.regexp);
+    const { path, keys, regexp } = this.state;
+
+    let result = pathname.match(regexp);
     if (result) {
       const [url, ...values] = result;
-      const params = this.keys.reduce((memo, key, idx) => {
+      const params = keys.reduce((memo, key, idx) => {
         memo[key] = values[idx];
         return memo;
       }, {});
