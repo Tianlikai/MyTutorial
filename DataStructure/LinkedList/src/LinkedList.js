@@ -1,11 +1,12 @@
-function Node(element) {
-  this.element = element;
-  this.next = null;
-}
+const Node = require("./Node");
 
 function LinkedList() {
   this.head = new Node("head");
 }
+
+LinkedList.prototype.getHead = function() {
+  return this.head;
+};
 
 LinkedList.prototype.find = function(item) {
   var currentNode = this.head;
@@ -36,3 +37,29 @@ LinkedList.prototype.delete = function(item) {
     previousNode.next = previousNode.next.next;
   }
 };
+
+LinkedList.prototype.display = function() {
+  var currentNode = this.head;
+  while (currentNode) {
+    console.log(
+      `element: ${currentNode.element}, next: ${
+        currentNode.next ? currentNode.next.element : null
+      }`
+    );
+    currentNode = currentNode.next;
+  }
+};
+
+LinkedList.display = function(list) {
+  var linkList = list;
+  while (linkList) {
+    console.log(
+      `element: ${linkList.element}, next: ${
+        linkList.next ? linkList.next.element : null
+      }`
+    );
+    linkList = linkList.next;
+  }
+};
+
+module.exports = LinkedList;

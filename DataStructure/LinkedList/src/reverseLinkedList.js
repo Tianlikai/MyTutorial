@@ -20,6 +20,7 @@ function reverseList(head) {
   return previous;
 }
 
+module.exports = reverseList;
 /**
  * 方式
  * previous = current -> current.next => previous(上一次循环缓存的 current) = current -> current.next
