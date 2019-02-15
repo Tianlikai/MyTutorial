@@ -1,0 +1,34 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>Hi jason!</div>
+    <script src="/script.js"></script>
+    <script>
+      console.log(document.cookie);
+      fetch("http://127.0.0.1:8888", {
+        method: "POST",
+        headers: {
+          "X-Test-Cors": "1111"
+        }
+      });
+      // function initXMLhttp() {
+      //   var xmlhttp;
+      //   if (window.XMLHttpRequest) {
+      //     xmlhttp = new XMLHttpRequest();
+      //   } else {
+      //     xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      //   }
+      //   return xmlhttp;
+      // }
+
+      // const xhr = this.initXMLhttp();
+      // xhr.open("GET", "http://127.0.0.1:8888");
+      // xhr.send();
+    </script>
+  </body>
+</html>
