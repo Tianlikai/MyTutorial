@@ -19,3 +19,20 @@
 - http-proxy
 - nginx
 - websocket
+
+## jsonP
+
+通过标签引入的外部字段，例如<script />, <link />, <img />
+
+局限
+
+- 只支持 get 请求
+- 具有 xss 注入风险
+
+## cors
+
+通过纯后端实现，后端通过设置 http 请求头对访问进行限制。
+
+## postMessage
+
+通过 <iframe> 引入的页面中之间的通信

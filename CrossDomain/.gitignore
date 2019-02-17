@@ -1,0 +1,8 @@
+node_modules/
+.vscode/
+.DS_Store
+.idea/
+dist/
+docs/
+src/settings/mocker.js
+package-lock.json
