@@ -40,6 +40,46 @@ class Sorting {
   }
 
   /**
+   * 选择排序 升序
+   * j 与 目标值进行比较
+   * @param {*} data
+   * @returns {void}
+   */
+  selectionSortByAsc(data) {
+    if (this.getType(data) !== "array" || data.length <= 1) return data;
+    let temp, max;
+    for (let i = data.length - 1; i > 0; i -= 1) {
+      max = i;
+      for (let j = i - 1; j >= 0; j -= 1) {
+        if (data[j] > data[max]) max = j;
+        temp = data[j];
+        data[j] = data[max];
+        data[max] = temp;
+      }
+    }
+  }
+
+  /**
+   * 选择排序 降序
+   * j 与 目标值进行比较
+   * @param {*} data
+   * @returns {void}
+   */
+  selectionSortByDesc(data) {
+    if (this.getType(data) !== "array" || data.length <= 1) return data;
+    let temp, min;
+    for (let i = 0; i < data.length - 2; i += 1) {
+      min = i;
+      for (let j = i + 1; j < data.length - 1; j += 1) {
+        if (data[j] < data[min]) min = j;
+        temp = data[j];
+        data[j] = data[min];
+        data[min] = temp;
+      }
+    }
+  }
+
+  /**
    * 插入排序 升序排列 大的数往右挪
    * 对于i 的左侧 [0 ,i - 1] 是一个排好序的数组
    * 对于i 的右侧 [i + 1, n] 是等待插入的元素
@@ -94,5 +134,5 @@ class Sorting {
 let data = [31, 41, 59, 26, 41, 58];
 let sort = new Sorting();
 
-sort.bubbleSortByDesc(data);
+sort.selectionSortByAsc(data);
 console.log(data);
