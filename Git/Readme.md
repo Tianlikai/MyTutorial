@@ -32,5 +32,5 @@
 
 - 文件名变更 git mv <source> <destination>
 
-- 对历史 commit 的信息做变更 git commit rebase -i <branch> rename 
-- 合并多个连续历史 commit git commit rebase -i <branch> squash
+- 对历史 commit 的信息做变更 git rebase -i <branch> rename 
+- 合并多个连续历史 commit git rebase -i <branch> squash
