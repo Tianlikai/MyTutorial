@@ -1,6 +1,6 @@
 # git
 
-## git文件
+## git 文件
 
 - 一个 tree 下面可能是 tree 也可能是 blob
 - 一个 blob 对应一个文件
@@ -8,7 +8,8 @@
 ## 分离头指针
 
 分离头指针没有和任何分支挂钩，可能回丢失信息
-> 用处 可以在某个commit上进行修改，然后从此次 commit 上新建 branch，命令 git branch <branch> commit 
+
+> 用处 可以在某个 commit 上进行修改，然后从此次 commit 上新建 branch，命令 git branch <branch> commit
 
 ## 变基 rebase
 
@@ -32,5 +33,5 @@
 
 - 文件名变更 git mv <source> <destination>
 
-- 对历史 commit 的信息做变更 git rebase -i <branch> rename 
+- 对历史 commit 的信息做变更 git rebase -i <branch> rename
 - 合并多个连续历史 commit git rebase -i <branch> squash
