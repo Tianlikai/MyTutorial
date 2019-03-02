@@ -50,6 +50,14 @@ LinkedList.prototype.display = function() {
   }
 };
 
+LinkedList.prototype.display2 = function() {
+  var currentNode = this.head;
+  while (currentNode) {
+    console.log(currentNode.element);
+    currentNode = currentNode.next;
+  }
+};
+
 LinkedList.display = function(list) {
   var linkList = list;
   while (linkList) {

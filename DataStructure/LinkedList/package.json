@@ -2,7 +2,7 @@
   "name": "LinkedList",
   "version": "1.0.0",
   "description": "链表是一种连续线性数据结构",
-  "main": "src/LinkedList.2.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

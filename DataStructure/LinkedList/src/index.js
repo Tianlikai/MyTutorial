@@ -1,8 +1,8 @@
 const LinkedList = require("./LinkedList");
-const reverseLinkedList = require("./reverseLinkedList");
-const swapNodesInPair = require("./swapNodesInPair");
+const QLinkedList = require("./question");
 
 var link = new LinkedList();
+var solution = new QLinkedList();
 
 link.insert("1", "head");
 link.insert("2", "1");
@@ -11,15 +11,6 @@ link.insert("4", "3");
 
 var head = link.getHead();
 
-/**
- * 链表反转测试
- */
-// let result = reverseLinkedList(head);
-// LinkedList.display(result);
+const pointer = solution.reverseList(head);
 
-/**
- * 链表两两交换测试
- */
-
-let result2 = swapNodesInPair(head);
-LinkedList.display(result2);
+LinkedList.display(pointer);
