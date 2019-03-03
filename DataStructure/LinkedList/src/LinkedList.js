@@ -1,7 +1,7 @@
 const Node = require("./Node");
 
 function LinkedList() {
-  this.head = new Node("head");
+  this.head = new Node("1");
 }
 
 LinkedList.prototype.getHead = function() {
