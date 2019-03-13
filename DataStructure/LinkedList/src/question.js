@@ -87,6 +87,79 @@ class QLinkedList {
 
     return root.next;
   }
+
+  /**
+   * 给定一个链表，判断链表中是否有环。
+   * 给定数组判断
+   * @param {Object} head
+   * @return {boolean}
+   */
+  hasCycleMethod1(head) {
+    var arr = [];
+    while (head) {
+      if (arr.indexOf(head) >= 0) return true;
+      arr.push(head);
+      head = head.next;
+    }
+    return false;
+  }
+
+  /**
+   * 给定一个链表，判断链表中是否有环。
+   * 快慢指针
+   * @param {Object} head
+   * @return {boolean}
+   */
+  hasCycleMethod2(head) {
+    var fast = (slow = head);
+    while (fast && fast.next && slow) {
+      fast = fast.next.next;
+      slow = slow.next;
+      if (fast === slow) return true;
+    }
+    return false;
+  }
+
+  /**
+   * 环形链表ii
+   * 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+   * @param {*} head
+   */
+  detectCycleMethod1(head) {
+    var arr = [];
+    while (head) {
+      if (arr.indexOf(head) >= 0) return head;
+      arr.push(head);
+      head = head.next;
+    }
+    return null;
+  }
+
+  /**
+   * 环形链表ii
+   * 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+   * 快慢指针解法
+   * @param {*} head
+   */
+  detectCycleMethod2(head) {
+    if (!head || !head.next) return null;
+
+    var fast = (slow = head);
+
+    while (fast && fast.next) {
+      fast = fast.next.next;
+      slow = slow.next;
+      if (fast === slow) {
+        // 快慢指针相遇时，不一定时第一个进入循环的node
+        while (slow !== head) {
+          slow = slow.next;
+          head = head.next;
+        }
+        return slow;
+      }
+    }
+    return null;
+  }
 }
 
 module.exports = QLinkedList;

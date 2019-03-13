@@ -14,13 +14,10 @@ function readFile(filename) {
 function* read() {
   console.log("begin");
   let a = yield readFile("1.txt");
-  console.log(a);
   let b = yield readFile("2.txt");
-  console.log(b);
   let c = yield readFile("3.txt");
-  console.log(c);
   console.log("end");
-  return c;
+  return [a,b,c];
 }
 
 let result = co(read);
