@@ -128,7 +128,7 @@ MyPromise.prototype.then = function(onFulfilled, onRejected) {
       setTimeout(function() {
         try {
           let x = onRejected(self.value);
-          resolvePromise(promise2, resolve, reject);
+          resolvePromise(promise2, x, resolve, reject);
         } catch (error) {
           reject(error);
         }
