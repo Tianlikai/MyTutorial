@@ -4,13 +4,13 @@ const QLinkedList = require("./question");
 var link = new LinkedList();
 var solution = new QLinkedList();
 
-link.insert("2", "1");
-link.insert("3", "2");
-link.insert("4", "3");
-link.insert("5", "4");
+link.insert("0", "1");
+link.insert("0", "0");
+link.insert("1", "0");
 
 var head = link.getHead();
 
-const pointer = solution.reverseBetween(head, 2, 4);
+const result = solution.isPalindrome2(head);
+console.log(result);
 
-LinkedList.display(pointer);
+LinkedList.display(head);

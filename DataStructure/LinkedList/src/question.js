@@ -160,6 +160,75 @@ class QLinkedList {
     }
     return null;
   }
+
+  /**
+   * leetcode 25
+   *
+   * 给出一个链表，每 k 个节点一组进行翻转，并返回翻转后的链表。
+   * @param {*} head
+   * @param {*} k
+   */
+  reverseKGroup(head, k) {}
+
+  /**
+   * leetcode 234
+   * 请判断一个链表是否为回文链表。
+   *
+   * 方法1: 入栈，出栈相互比较
+   * @param {*} head
+   */
+  isPalindrome1(head) {
+    // 空间复杂度 o(n)
+    var stack = [];
+    let temp = head;
+    while (temp) {
+      stack.push(temp.element);
+      temp = temp.next;
+    }
+    temp = head;
+    while (temp) {
+      if (temp.element !== stack.pop()) return false;
+      temp = temp.next;
+    }
+    return true;
+  }
+
+  /**
+   * 方法2
+   * @param {*} head
+   */
+  isPalindrome2(head) {
+    let fast = head,
+      slow = head,
+      list1 = head,
+      list2,
+      pre = null,
+      next;
+    // 找链表中点
+    while (fast && fast.next) {
+      fast = fast.next.next;
+      slow = slow.next;
+    }
+
+    // 反转后半段链表
+    while (slow) {
+      next = slow.next;
+      slow.next = pre;
+      pre = slow;
+      slow = next;
+    }
+
+    list2 = pre.next;
+    // 比较前后链表
+    while (list2) {
+      if (list1.element !== list2.element) return false;
+      list1 = list1.next;
+      list2 = list2.next;
+    }
+    return true;
+  }
 }
+
+// [1,0,1]
 
 module.exports = QLinkedList;
