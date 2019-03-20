@@ -1,3 +1,13 @@
+function comparison(map1, map2) {
+  let keys1 = Object.keys(map1);
+  let keys2 = Object.keys(map2);
+  if (keys1.length !== keys2.length) return false;
+  for (let i = 0; i < keys1.length; i += 1) {
+    let key = keys1[i];
+    if (!(key in map2) || map1[key] !== map2[key]) return false;
+  }
+  return true;
+}
 class Solution {
   /**
    * leetcode 242
@@ -15,7 +25,7 @@ class Solution {
     for (let c of t) {
       map2[c] = !map2[c] ? 1 : map2[c] + 1;
     }
-    return map1 == map2;
+    return comparison(map1, map2);
   }
 
   /**
@@ -61,5 +71,5 @@ class Solution {
 }
 var s = new Solution();
 
-const res = s.twoSum([11, 2, 8, 7], 9);
+const res = s.isAnagram1("anagram", "nagaram");
 console.log(res);
