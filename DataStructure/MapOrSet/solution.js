@@ -68,8 +68,35 @@ class Solution {
       map[item] = i;
     }
   }
+
+  /**
+   * leetcode 15. 三数之和
+   *
+   * o(n^2) 解决
+   */
+  threeSum(nums) {
+    let i, j, target, a, len, map, result;
+    nums = nums.sort((x, y) => x - y);
+    result = {};
+    len = nums.length;
+    for (i = 0; i < len - 1; i += 1) {
+      target = nums[i];
+
+      map = {};
+      for (j = i + 1; j < len; j += 1) {
+        a = nums[j];
+        if (map[-target - a] !== undefined) {
+          result[`${target}${-target - a}`] = [target, -target - a, a];
+        }
+        map[a] = j;
+      }
+    }
+    let res = [];
+    Object.keys(result).map(key => res.unshift(result[key]));
+    return res;
+  }
 }
 var s = new Solution();
 
-const res = s.isAnagram1("anagram", "nagaram");
+const res = s.threeSum([-1, 1, 0]);
 console.log(res);
