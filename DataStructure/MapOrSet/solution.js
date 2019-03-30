@@ -131,8 +131,27 @@ class Solution {
     }
     return result;
   }
+
+  /**
+   * leetcode
+   * 169. 求众数
+   * @param {*} nums
+   */
+  majorityElement(nums) {
+    let map = {},
+      key;
+    for (let i = 0; i < nums.length; i += 1) {
+      key = nums[i];
+      if (map[key]) {
+        map[key] += 1;
+      } else {
+        map[key] = 1;
+      }
+    }
+    return Object.keys(map).find(key => map[key] > nums.length / 2);
+  }
 }
 var s = new Solution();
 
-const res = s.threeSum2([-1, 0, 1, 2, -1, -4]);
+const res = s.majorityElement([3, 2, 3]);
 console.log(res);
