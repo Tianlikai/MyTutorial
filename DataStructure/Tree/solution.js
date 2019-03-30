@@ -30,6 +30,87 @@ class Solution {
       return 0;
     }
   }
+
+  /**
+   * leetcode
+   *
+   * 98验证二叉搜索树
+   * @param {*} root
+   */
+  isValidBST(root) {
+    if (!root) return false;
+  }
+
+  /**
+   * leetcode
+   * 144. 二叉树的前序遍历
+   */
+  preorderTraversal(root) {
+    let result = [];
+    preOrder(root, result);
+    return result;
+  }
+
+  /**
+   * leetcode
+   * 94. 二叉树的中序遍历
+   * @param {*} root
+   */
+  inorderTraversal(root) {
+    let result = [];
+    inOrder(root, result);
+    return result;
+  }
+
+  /**
+   * leetcode
+   * 145. 二叉树的后序遍历
+   * @param {*} root
+   */
+  postorderTraversal(root) {
+    let result = [];
+    inOrder(root, result);
+    return result;
+  }
+}
+
+function preOrder(root, result) {
+  if (root) {
+    result.push(root.val);
+    if (root.left) {
+      preOrder(root.left, result);
+    }
+    if (root.right) {
+      preOrder(root.right, result);
+    }
+  }
+}
+
+function inOrder(root, result) {
+  if (root) {
+    if (root.left) {
+      inOrder(root.left, result);
+    }
+    result.push(root.val);
+    if (root.right) {
+      inOrder(root.right, result);
+    }
+  }
+}
+
+function postOrder(root, result) {
+  if (root) {
+    if (root.left) {
+      postOrder(root.left, result);
+    }
+    if (root.right) {
+      postOrder(root.right, result);
+    }
+    result.push(root.val);
+  }
 }
 
 const ins = new Solution();
+
+let res = ins.preorderTraversal(root);
+console.log(res);
