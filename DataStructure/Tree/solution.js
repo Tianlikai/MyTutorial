@@ -38,7 +38,13 @@ class Solution {
    * @param {*} root
    */
   isValidBST(root) {
-    if (!root) return false;
+    let result = [];
+    inOrder(root, result);
+    // 二插搜索树，中序遍历为升序
+    for (let i = 0; i < result.length - 1; i += 1) {
+      if (result[i] >= result[i + 1]) return false;
+    }
+    return true;
   }
 
   /**
@@ -91,7 +97,9 @@ function inOrder(root, result) {
     if (root.left) {
       inOrder(root.left, result);
     }
-    result.push(root.val);
+    if (root.val !== null) {
+      result.push(root.val);
+    }
     if (root.right) {
       inOrder(root.right, result);
     }
