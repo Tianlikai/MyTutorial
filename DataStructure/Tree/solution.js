@@ -44,6 +44,18 @@ function ismirror(p, q) {
   );
 }
 
+// 递归解法
+function loop(root, level, result) {
+  if (!root) return;
+  if (!result[level]) {
+    result[level] = [root.val];
+  } else {
+    result[level].push(root.val);
+  }
+  if (root.left) loop(root.left, level + 1, result);
+  if (root.right) loop(root.right, level + 1, result);
+}
+
 class Solution {
   /**
    * leetcode 104. 二叉树的最大深度
@@ -140,6 +152,18 @@ class Solution {
    * @param {*} root
    */
   isSymmetric2(root) {}
+
+  /**
+   * 102. 二叉树的层次遍历
+   *
+   * 递归解法
+   * @param {*} root
+   */
+  levelOrder(root) {
+    let result = [];
+    loop(root, 0, result);
+    return result;
+  }
 }
 
 const ins = new Solution();
