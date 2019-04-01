@@ -1,3 +1,49 @@
+function preOrder(root, result) {
+  if (root) {
+    result.push(root.val);
+    if (root.left) {
+      preOrder(root.left, result);
+    }
+    if (root.right) {
+      preOrder(root.right, result);
+    }
+  }
+}
+
+function inOrder(root, result) {
+  if (root) {
+    if (root.left) {
+      inOrder(root.left, result);
+    }
+    if (root.val !== null) {
+      result.push(root.val);
+    }
+    if (root.right) {
+      inOrder(root.right, result);
+    }
+  }
+}
+
+function postOrder(root, result) {
+  if (root) {
+    if (root.left) {
+      postOrder(root.left, result);
+    }
+    if (root.right) {
+      postOrder(root.right, result);
+    }
+    result.push(root.val);
+  }
+}
+
+function ismirror(p, q) {
+  if (!p && !q) return true;
+  if (!p || !q) return false;
+  return (
+    p.val === q.val && ismirror(p.right, q.left) && ismirror(p.left, q.right)
+  );
+}
+
 class Solution {
   /**
    * leetcode 104. 二叉树的最大深度
@@ -78,44 +124,22 @@ class Solution {
     inOrder(root, result);
     return result;
   }
-}
 
-function preOrder(root, result) {
-  if (root) {
-    result.push(root.val);
-    if (root.left) {
-      preOrder(root.left, result);
-    }
-    if (root.right) {
-      preOrder(root.right, result);
-    }
+  /**
+   * 101. 对称二叉树
+   *
+   * 递归解法
+   * @param {*} root
+   */
+  isSymmetric(root) {
+    return ismirror(root, root);
   }
-}
 
-function inOrder(root, result) {
-  if (root) {
-    if (root.left) {
-      inOrder(root.left, result);
-    }
-    if (root.val !== null) {
-      result.push(root.val);
-    }
-    if (root.right) {
-      inOrder(root.right, result);
-    }
-  }
-}
-
-function postOrder(root, result) {
-  if (root) {
-    if (root.left) {
-      postOrder(root.left, result);
-    }
-    if (root.right) {
-      postOrder(root.right, result);
-    }
-    result.push(root.val);
-  }
+  /**
+   * 迭代解法
+   * @param {*} root
+   */
+  isSymmetric2(root) {}
 }
 
 const ins = new Solution();
