@@ -155,11 +155,38 @@ class Solution {
 
   /**
    * 102. 二叉树的层次遍历
-   *
-   * 递归解法
+   * 利用队列实现
    * @param {*} root
    */
   levelOrder(root) {
+    let result = [];
+    let queue = [];
+
+    if (!root) return result;
+    queue.push(root);
+
+    while (queue.length) {
+      let layer = [];
+      let len = queue.length; // js 的 array 长度会动态修改
+      for (let i = 0; i < len; i += 1) {
+        let node = queue[0];
+        if (node.left) queue.push(node.left);
+        if (node.right) queue.push(node.right);
+        layer.push(node.val);
+        // 将遍历后的节点弹出
+        queue.shift();
+      }
+      result.push(layer);
+    }
+
+    return result;
+  }
+
+  /**
+   * 递归解法
+   * @param {*} root
+   */
+  levelOrder1(root) {
     let result = [];
     loop(root, 0, result);
     return result;
