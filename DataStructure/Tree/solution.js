@@ -56,6 +56,21 @@ function loop(root, level, result) {
   if (root.right) loop(root.right, level + 1, result);
 }
 
+// 深度优先
+function loopZigzagLevelOrder(root, level, result) {
+  if (!root) return;
+  if (!result[level]) result[level] = [];
+
+  // 双关队列
+  if (level % 2 === 0) {
+    result[level].push(root.val);
+  } else {
+    result[level].unshift(root.val);
+  }
+
+  if (root.left) loopZigzagLevelOrder(root.left, level + 1, result);
+  if (root.right) loopZigzagLevelOrder(root.right, level + 1, result);
+}
 class Solution {
   /**
    * leetcode 104. 二叉树的最大深度
@@ -243,6 +258,17 @@ class Solution {
       result.unshift(layer);
     }
 
+    return result;
+  }
+
+  /**
+   * 103. 二叉树的锯齿形层次遍历
+   *
+   * @param {*} root
+   */
+  zigzagLevelOrder(root) {
+    let result = [];
+    loop(root, 0, result);
     return result;
   }
 }
