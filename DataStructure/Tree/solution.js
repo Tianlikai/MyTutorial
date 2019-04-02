@@ -148,10 +148,38 @@ class Solution {
   }
 
   /**
-   * 迭代解法
+   * 层序遍历，层层比较
    * @param {*} root
    */
-  isSymmetric2(root) {}
+  isSymmetric2(root) {
+    if (!root) return true;
+
+    let queue = [];
+    queue[root];
+
+    while (queue.length) {
+      let layer = [];
+      let len = queue.length; // js 的 array 长度会动态修改
+      for (let i = 0; i < len; i += 1) {
+        let node = queue[0]; // 每次取队列头部进行处理
+        if (node.left) queue.push(node.left);
+        if (node.right) queue.push(node.right);
+        layer.push(node.val);
+        // 将遍历后的节点弹出
+        queue.shift();
+      }
+
+      let p = 0;
+      let q = layer.length - 1;
+      while (p < q) {
+        if (layer[p] !== layer[q]) return false;
+        p += 1;
+        q -= 1;
+      }
+    }
+
+    return true;
+  }
 
   /**
    * 102. 二叉树的层次遍历
@@ -163,13 +191,13 @@ class Solution {
     let queue = [];
 
     if (!root) return result;
-    queue.push(root);
+    queue[root];
 
     while (queue.length) {
       let layer = [];
       let len = queue.length; // js 的 array 长度会动态修改
       for (let i = 0; i < len; i += 1) {
-        let node = queue[0];
+        let node = queue[0]; // 每次取队列头部进行处理
         if (node.left) queue.push(node.left);
         if (node.right) queue.push(node.right);
         layer.push(node.val);
