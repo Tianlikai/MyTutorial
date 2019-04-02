@@ -219,6 +219,32 @@ class Solution {
     loop(root, 0, result);
     return result;
   }
+
+  /**
+   * 107. 二叉树的层次遍历 II
+   *
+   * @param {*} root
+   */
+  levelOrderBottom(root) {
+    if (!root) return [];
+
+    let result = [];
+    let queue = [root];
+
+    while (queue.length) {
+      let layer = [];
+      let len = queue.length; // js 的 array 长度会动态修改
+      for (let i = 0; i < len; i += 1) {
+        let node = queue.shift();
+        layer.push(node.val);
+        if (node.left) queue.push(node.left);
+        if (node.right) queue.push(node.right);
+      }
+      result.unshift(layer);
+    }
+
+    return result;
+  }
 }
 
 const ins = new Solution();
