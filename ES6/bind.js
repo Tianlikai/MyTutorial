@@ -5,26 +5,30 @@
  * 并且实现分次给参数以及new 构造函数时不丢失上下问
  */
 Function.prototype.myBind = function(context) {
-    if (typeof this !== 'function') throw Error('context expected a function')
-    var self = this
-    var args = Array.prototype.slice.call(arguments, 1)
-    var fNOP = function(){}
-    var fBound = function() {
-        var bindArgs = Array.prototype.slice.call(arguments)
-        self.apply(this instanceof self ? this : context, args.concat(bindArgs))
-    }
-    fNOP.prototype = this.prototype
-    fBound.prototype = new fNOP()
-    return fBound
-}
+  if (typeof this !== "function") throw Error("context expected a function");
+  var self = this;
+  var args = Array.prototype.slice.call(arguments, 1);
+  var fNOP = function() {};
+  var fBound = function() {
+    var bindArgs = Array.prototype.slice.call(arguments);
+    const scope = this instanceof self ? this : context;
+    self.apply(scope, args.concat(bindArgs));
+  };
+  fNOP.prototype = this.prototype;
+  fBound.prototype = new fNOP();
+  return fBound;
+};
 
-function foo () {
-    console.log(this.value)
+function foo() {
+  console.log(this.value);
 }
 
 var a = {
-    value: 1
-}
+  value: 1
+};
 
-var bind = foo.myBind(a)
-bind()
+var bind = foo.myBind(a);
+bind();
+bind();
+bind();
+bind();

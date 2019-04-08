@@ -1,21 +1,19 @@
 /**
  * 浅拷贝
  * 1 Object.assign()
- * 2 一层循环
+ * 2 es6 结构
+ * 3 一层循环
  */
 
+ /**
+  * 浅复制
+  */
 function shallowCopy(source) {
-  var name;
-  var result = {};
-  for (name in source) {
-    if (source.hasOwnProperty(name)) {
-      result[name] = source[name];
+  let result = {};
+  for(let key in source) {
+    if (source.hasOwnProperty(key)) {
+      result[key] = source[key]
     }
   }
   return result;
 }
-
-let obj = { a: { name: "jason" } };
-let copyOBJ = shallowCopy(obj);
-copyOBJ.a.age = 22;
-console.log(obj.a);
