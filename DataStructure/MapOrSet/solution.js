@@ -195,9 +195,30 @@ class Solution {
     }
     return result;
   }
+
+  /**
+   * @param {number[]} nums
+   * @return {number[]}
+   */
+  majorityElement4(nums) {
+    const result = [];
+    const map = {};
+    const valid = nums.length / 3;
+
+    for (let n of nums) {
+      if (map[n]) {
+        map[n] += 1;
+      } else {
+        map[n] = 1;
+      }
+      if (map[n] > valid && !result.includes(n)) result.push(n);
+    }
+
+    return result;
+  }
 }
 
 var s = new Solution();
 
-const res = s.majorityElement3([3, 3, 4]);
+const res = s.majorityElement4([3, 2, 3]);
 console.log(res);
