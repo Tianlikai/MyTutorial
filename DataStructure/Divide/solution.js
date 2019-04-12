@@ -24,9 +24,35 @@ class Solution {
     }
     return this.myPow2(x * x, n / 2);
   }
+
+  /**
+   * leetcode 22 括号生成
+   * 给出 n 代表生成括号的对数，请你写出一个函数，使其能够生成所有可能的并且有效的括号组合。
+   *
+   * @param {number} n
+   * @return {string[]}
+   */
+  generateParenthesis(n) {
+    const result = [];
+    loopParenthesis(0, 0, n, "", result);
+    return result;
+  }
+}
+
+function loopParenthesis(left, right, n, str, result) {
+  if (left === n && right == n) {
+    result.push(str);
+    return;
+  }
+  if (left < n) {
+    loopParenthesis(left + 1, right, n, `${str}(`, result);
+  }
+  if (right < left) {
+    loopParenthesis(left, right + 1, n, `${str})`, result);
+  }
 }
 
 const ins = new Solution();
-const result = ins.myPow2(2, 10);
+const result = ins.generateParenthesis(2);
 
 console.log(result);
