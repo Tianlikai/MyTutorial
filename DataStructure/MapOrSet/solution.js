@@ -150,8 +150,54 @@ class Solution {
     }
     return Object.keys(map).find(key => map[key] > nums.length / 2);
   }
+
+  /**
+   * @param {number[]} nums
+   * @return {number}
+   */
+  majorityElement2(nums) {
+    nums = nums.sort((a, b) => a - b);
+    let count = 0;
+    let res = nums[0];
+    for (let i = 0; i < nums.length; i += 1) {
+      if (res === nums[i]) {
+        count += 1;
+        if (count > nums.length / 2) {
+          break;
+        }
+      } else {
+        res = nums[i];
+        count = 1;
+      }
+    }
+    return res;
+  }
+
+  /**
+   * 摩尔投票算法
+   *
+   * @param {number[]} nums
+   * @return {number}
+   */
+  majorityElement3(nums) {
+    let count = 0;
+    let result = nums[0];
+    for (let n of nums) {
+      if (n === result) {
+        count += 1;
+      } else {
+        count -= 1;
+        if (count === 0) {
+          result = n;
+          count = 1;
+        }
+      }
+    }
+    return result;
+  }
 }
+
 var s = new Solution();
 
-const res = s.majorityElement([3, 2, 3]);
+const res = s.majorityElement3([3, 3, 4]);
 console.log(res);
