@@ -95,8 +95,26 @@ class QArray {
     }
     return i + 1;
   }
+
+  /**
+   * 27. 移除元素
+   *
+   * @param {*} nums
+   * @param {*} val
+   */
+  removeElement(nums, val) {
+    let i = 0;
+    for (let j = 0; j < nums.length; j += 1) {
+      if (nums[j] !== val) {
+        nums[i] = nums[j];
+        i += 1;
+      }
+    }
+    return i;
+  }
 }
 
 const ins = new QArray();
-const result = ins.removeDuplicates([1, 1, 2]);
-console.log(result);
+const arr = [2, 2, 3, 3];
+const result = ins.removeElement(arr, 3);
+console.log(arr);
