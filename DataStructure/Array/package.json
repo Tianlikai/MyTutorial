@@ -1,0 +1,12 @@
+{
+  "name": "Array",
+  "version": "1.0.0",
+  "description": "数组是一种连续线性数据结构，在内存中是一段连续的储存区域。",
+  "main": "question.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -75,6 +75,28 @@ class QArray {
       }
     }
   }
+
+  /**
+   * 26. 删除排序数组中的重复项
+   *
+   * 前提
+   * 1 有序
+   * 2 不需要管超出新数组长度之后的元素
+   * @param {*} nums
+   */
+  removeDuplicates(nums) {
+    if (nums.length < 2) return nums.length;
+    let i = 0;
+    for (let j = 1; j < nums.length; j += 1) {
+      if (nums[j] != nums[i]) {
+        i += 1;
+        nums[i] = nums[j];
+      }
+    }
+    return i + 1;
+  }
 }
 
-module.exports = QArray;
+const ins = new QArray();
+const result = ins.removeDuplicates([1, 1, 2]);
+console.log(result);
