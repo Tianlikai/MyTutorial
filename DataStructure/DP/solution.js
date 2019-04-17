@@ -22,6 +22,17 @@ class Solution {
   climbStairs2(n) {
     return climbStairsLoop(n, {});
   }
+
+  fib(N) {
+    if (N === 0) {
+      return 0;
+    }
+    const Fib = [0, 1];
+    for (let i = 2; i <= N; i += 1) {
+      Fib[i] = Fib[i - 1] + Fib[i - 2];
+    }
+    return Fib[Fib.length - 1];
+  }
 }
 
 function climbStairsLoop(n, memo) {
@@ -32,5 +43,5 @@ function climbStairsLoop(n, memo) {
 }
 
 const ins = new Solution();
-const result = ins.climbStairs2(4);
+const result = ins.fib(1);
 console.log(result);
