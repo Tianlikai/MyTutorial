@@ -33,6 +33,38 @@ class Solution {
     }
     return Fib[Fib.length - 1];
   }
+
+  /**
+   * 120. 三角形最小路径和
+   *
+   * @param {number[][]} triangle
+   * @return {number}
+   */
+  minimumTotal(triangle) {
+    const depth = triangle.length;
+    const result = [];
+    minimumTotalLoop(0, 0, 0, triangle, result, depth);
+    return result;
+  }
+}
+
+/**
+ *
+ * @param {*} i 深度
+ * @param {*} j 广度
+ * @param {*} sum 和
+ * @param {*} array 原二维数组
+ * @param {*} result sum 数组
+ */
+function minimumTotalLoop(i, j, sum, array, result, depth) {
+  if (i >= depth) {
+    return result.push(sum);
+  }
+  let width = array[i].length;
+  for (let k = 0; k < width; k += 1) {
+    minimumTotalLoop(i + 1, k, sum + array[i][k], array, result, depth);
+    minimumTotalLoop(i + 1, k + 1, sum + array[i][k + 1], array, result, depth);
+  }
 }
 
 function climbStairsLoop(n, memo) {
@@ -42,6 +74,10 @@ function climbStairsLoop(n, memo) {
   return memo[n];
 }
 
+const array = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]];
+
 const ins = new Solution();
-const result = ins.fib(1);
-console.log(result);
+const result = ins.minimumTotal(array);
+// console.log(result);
+
+console.log(typeof null);
