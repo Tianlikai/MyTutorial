@@ -46,6 +46,25 @@ class Solution {
     minimumTotalLoop(0, 0, 0, triangle, result, depth);
     return result;
   }
+
+  /**
+   * 120. 三角形最小路径和
+   *
+   * 动态规划方案
+   * @param {*} triangle
+   */
+  minimumTotal2(triangle) {
+    // 倒数第二行开始
+    for (let i = triangle.length - 2; i >= 0; i -= 1) {
+      for (let j = 0; j < triangle[i].length; j += 1) {
+        const left = triangle[i + 1][j];
+        const right = triangle[i + 1][j + 1];
+        triangle[i][j] += Math.min(triangle[i + 1][j], triangle[i + 1][j + 1]);
+        console.log(triangle[i][j]);
+      }
+    }
+    return triangle[0][0];
+  }
 }
 
 /**
@@ -77,7 +96,4 @@ function climbStairsLoop(n, memo) {
 const array = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]];
 
 const ins = new Solution();
-const result = ins.minimumTotal(array);
-// console.log(result);
-
-console.log(typeof null);
+const result = ins.minimumTotal2(array);
