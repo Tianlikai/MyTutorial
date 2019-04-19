@@ -179,10 +179,54 @@ class Solution {
     }
     return max;
   }
+
+  /**
+   * 121. 买卖股票的最佳时机
+   *
+   * @param {number[]} prices
+   * @return {number}
+   */
+  maxProfit(prices) {
+    if (!prices) return 0;
+    let min = prices[0];
+    let profit = 0;
+    for (let i = 1; i < prices.length; i += 1) {
+      min = Math.min(prices[i], min);
+      profit = Math.max(profit, prices[i] - min);
+    }
+    return profit;
+  }
+
+  /**
+   * 122 买卖股票的最佳时机II
+   * 动态规划解决
+   * @param {number[]} prices
+   * @return {number}
+   */
+  maxProfitII(prices) {
+    if (!prices || prices.length === 0) return 0;
+
+    let res = 0;
+    const profit = [];
+    for (let i = 0; i < prices.length; i += 1) {
+      profit[i] = [];
+    }
+
+    profit[0][0] = 0;
+    profit[0][1] = -prices[0];
+
+    for (let d = 1; d < prices.length; d += 1) {
+      profit[d][0] = Math.max(profit[d - 1][0], profit[d - 1][1] + prices[d]);
+      profit[d][1] = Math.max(profit[d - 1][1], profit[d - 1][0] - prices[d]);
+      res = Math.max(res, profit[d][0], profit[d][1]);
+    }
+
+    return res;
+  }
 }
 
-const array = [2, -5, -2, -4, 3];
+const array = [2, 1];
 
 const ins = new Solution();
-const result = ins.maxProduct3(array);
+result = ins.maxProfitII(array);
 console.log(result);
