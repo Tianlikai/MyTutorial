@@ -11,3 +11,11 @@ function myNew() {
   var res = Constructor.apply(obj, arguments);
   return typeof res === "object" ? res : obj;
 }
+
+function myNew2() {
+  let obj = {};
+  const Com = [...arguments].shift();
+  obj.__proto__ = Com.prototype;
+  const result = Com.call(obj, arguments);
+  return typeof result === "object" ? result : obj;
+}

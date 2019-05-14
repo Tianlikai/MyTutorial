@@ -107,13 +107,22 @@ MyPromise.prototype.then = function(onFulfilled, onRejected) {
   }
 };
 
+/**
+ * Promise.resolve('foo')
+ * 等价于
+ * new Promise(resolve => resolve('foo'))
+ */
 MyPromise.all = function(promises) {
   return new MyPromise(function(resolve, reject) {
-    const done = gen(promises.length, resolve);
-    for (let i = 0; i < promises.length; i += 1) {
-      promises[i].then(function(value) {
-        done(i, value);
-      }, reject);
+    if (promises.length === 0) {
+      return [];
+    } else {
+      const done = gen(promises.length, resolve);
+      for (let i = 0; i < promises.length; i += 1) {
+        promises[i].then(function(value) {
+          done(i, value);
+        }, reject);
+      }
     }
   });
 };

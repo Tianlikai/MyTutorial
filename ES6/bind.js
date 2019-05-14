@@ -6,15 +6,17 @@
  */
 Function.prototype.myBind = function(context) {
   if (typeof this !== "function") throw Error("context expected a function");
-  var self = this;
-  var args = Array.prototype.slice.call(arguments, 1);
-  var fNOP = function() {};
-  var fBound = function() {
-    var bindArgs = Array.prototype.slice.call(arguments);
-    const scope = this instanceof self ? this : context;
-    self.apply(scope, args.concat(bindArgs));
-  };
+  const self = this;
+  const args = [...arguments].slice(1);
+  const fNOP = function() {};
   fNOP.prototype = this.prototype;
+
+  const fBound = function() {
+    const bindArgs = [...args, ...arguments];
+    const scope = this instanceof self ? this : context;
+    self.apply(scope, bindArgs);
+  };
+
   fBound.prototype = new fNOP();
   return fBound;
 };
@@ -26,8 +28,7 @@ function foo() {
 var a = {
   value: 1
 };
-
-var bind = foo.myBind(a);
+var bind = foo.bind1(a);
 bind();
 bind();
 bind();

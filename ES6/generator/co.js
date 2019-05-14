@@ -28,3 +28,17 @@ function co2(gen) {
 }
 
 module.exports = co;
+
+function co3(gen) {
+  const it = gen();
+  return new Promise(function(resolve, reject) {
+    function next(lastVal) {
+      let { done, value } = it.next(lastVal);
+      if (done) {
+        resolve(value);
+      }
+      value.then(next, reject);
+    }
+    next();
+  });
+}

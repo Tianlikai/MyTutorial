@@ -1,17 +1,30 @@
-// 原声 apply 函数
-Function.prototype.myApply = function(context, arr) {
-    var context = context || window
-    context.fn = this
-    var result
-    if (!arr) {
-        result = context.fn()
-    } else {
-        var args = []
-        for (var i = 1, len = arr.length; i < len; ++i) {
-            args.push('arr[' + i + ']')
-        }
-        result = eval('context.fn(' + args + ')')
-    }
-    delete context.fn
-    return result
+Function.prototype.myApply = function(context, rest) {
+  if (!context) {
+    context = typeof window === "undefined" ? global : window;
+  }
+  context.fn = this;
+
+  let result;
+  if (rest === undefined || rest === null) {
+    result = context.fn(rest);
+  } else {
+    result = context.fn(...rest);
+  }
+
+  delete context.fn;
+  return result;
+};
+
+var foo = {
+  name: "Selina"
+};
+
+var name = "Chirs";
+
+function bar(job, age) {
+  console.log(this.name);
+  console.log(job, age);
 }
+
+bar.myApply(foo, ["programmer", 20]);
+bar.myApply(null, ["teacher", 25]);
