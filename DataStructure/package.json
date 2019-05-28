@@ -1,0 +1,12 @@
+{
+  "name": "DataStructure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "9.回文数.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

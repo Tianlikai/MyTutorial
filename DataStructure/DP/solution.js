@@ -198,7 +198,7 @@ class Solution {
   }
 
   /**
-   * 122 买卖股票的最佳时机II
+   * 122. 买卖股票的最佳时机II
    * 动态规划解决
    * @param {number[]} prices
    * @return {number}
