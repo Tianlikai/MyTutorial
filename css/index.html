@@ -1,0 +1,53 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .left {
+        background: #73de80; /* 绿色 */
+        opacity: 0.5;
+        border: 3px solid #f31264;
+        width: 200px;
+        height: 200px;
+        float: left;
+      }
+      .right {
+        /* 粉色 */
+        background: #ef5be2;
+        opacity: 0.5;
+        border: 3px solid #f31264;
+        width: 400px;
+        min-height: 100px;
+      }
+      .box {
+        background: #888;
+        margin-left: 50px;
+      }
+      .bfc {
+        overflow: hidden;
+      }
+      .little {
+        background: #fff;
+        width: 50px;
+        height: 50px;
+        margin: 10px;
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box bfc">
+      <div class="left"></div>
+      <div class="right bfc">
+        <div class="little"></div>
+        <div class="little"></div>
+        <div class="little"></div>
+      </div>
+    </div>
+  </body>
+</html>
