@@ -157,6 +157,17 @@ Promise2.prototype.catch = function(onRejected) {
   this.then(null, onRejected);
 };
 
+Promise2.prototype.finally = function(cb) {
+  const p = this.constructor;
+  return this.then(
+    value => p.resolve(cb()).then(() => value),
+    reason =>
+      p.resolve(cb()).then(() => {
+        throw reason;
+      })
+  );
+};
+
 Promise2.deferred = Promise2.defer = function() {
   const defer = {};
   defer.promise = new Promise2(function(resolve, reject) {
@@ -203,14 +214,4 @@ Promise2.serialPromise = function(promises) {
   }, Promise.resolve());
 };
 
-Promise2.finally = function(cb) {
-  const p = this.constructor;
-  return this.then(
-    value => p.resolve(cb()).then(() => value),
-    reason =>
-      p.resolve(cb()).then(() => {
-        throw reason;
-      })
-  );
-};
 module.exports = Promise2;
