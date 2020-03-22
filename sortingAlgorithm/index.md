@@ -224,3 +224,112 @@ function m_sort(array, tempArray, LS, RS, RE) {
 ```
 
 1. 分而治之，递归实现归并排序算法
+
+```javascript
+/**
+ * 递归实现
+ * @param {array} array 原数组
+ * @param {array} tempArray 临时数组
+ * @param {number} LS 左边起始下标
+ * @param {number} RE 右边结束下标
+ */
+function merge_sort1(array, tempArray, LS, RE) {
+  // 当元素只剩一个时退出
+  if (LS < RE) {
+    const center = Math.floor((RE + LS) / 2);
+    merge_sort1(array, tempArray, LS, center);
+    merge_sort1(array, tempArray, center + 1, RE);
+    m_sort(array, tempArray, LS, center + 1, RE);
+  }
+}
+```
+
+2. 归并排序，非递归实现
+
+将序列分为若干份，分别进行归并，最终进行合并。
+
+```
+/**
+ * 一趟归并
+ * @param {*} array 原数组
+ * @param {*} tempArray 临时数组
+ * @param {*} arrayLength 数组长度
+ * @param {*} length 归并对的长度
+ */
+function iter_merge_core(array, tempArray, arrayLength, length) {
+  let i = 0;
+  for (; i <= arrayLength - 2 * length; i += 2 * length) {
+    m_sort(array, tempArray, i, i + length, i + 2 * length - 1);
+  }
+  if (i + length < arrayLength) {
+    // 归并最后两个子列
+    m_sort(array, tempArray, i, i + length, arrayLength - 1);
+  } else {
+    // 最后只剩下一个子列
+    for (let j = i; j < arrayLength; j += 1) {
+      tempArray[j] = array[j];
+    }
+  }
+}
+
+/**
+ * 归并排序，非递归实现
+ * @param {*} array
+ */
+function merge_sort2(array) {
+  let length = 1;
+  const arrayLength = array.length;
+  const tempArray = new Array(array.length);
+  while (length < arrayLength) {
+    iter_merge_core(array, tempArray, arrayLength, length);
+    length *= 2;
+  }
+}
+```
+
+时间复杂度
+
+| 情况 | 时间复杂度         | 是否稳定 |
+| ---- | ------------------ | -------- |
+| 最坏 | T = O\(Nlog\(N\)\) | 稳定     |
+| 最好 | T = O\(Nlog\(N\)\) | 稳定     |
+| 平均 | T = O\(Nlog\(N\)\) | 稳定     |
+
+## 快速排序
+
+同样是分而治之的策略，以下是快排的策略：
+
+- 从一个数组中选主元
+- 根据主元，将数组分为两个独立子集，左边都小于主元，右边都大于主元。
+- 分别在两个独立子集中重复以上步骤
+
+`当数据规模较小时，插入排序效率较低`
+
+```javascript
+/**
+ * 固定主元
+ * 主元选取array的最后一个元素
+ * @param {*} array
+ * @param {*} left
+ * @param {*} right
+ */
+function quick_sort2(array, left, right) {
+  if (right - left >= 1) {
+    const pivot = array[right];
+    let i = left - 1;
+    let j = right;
+    for (;;) {
+      while (array[++i] < pivot) {}
+      while (array[--j] > pivot) {}
+      if (i < j) {
+        swap(array, i, j);
+      } else {
+        break;
+      }
+    }
+    swap(array, i, right);
+    quick_sort2(array, left, i - 1);
+    quick_sort2(array, i + 1, right);
+  }
+}
+```

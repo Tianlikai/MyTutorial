@@ -36,11 +36,61 @@ function m_sort(array, tempArray, LS, RS, RE) {
 
 /**
  * 递归实现
+ * @param {array} array 原数组
+ * @param {array} tempArray 临时数组
+ * @param {number} LS 左边起始下标
+ * @param {number} RE 右边结束下标
  */
-function merge_sort1() {}
+function merge_sort1(array, tempArray, LS, RE) {
+  // 当元素只剩一个时退出
+  if (LS < RE) {
+    const center = Math.floor((RE + LS) / 2);
+    merge_sort1(array, tempArray, LS, center);
+    merge_sort1(array, tempArray, center + 1, RE);
+    m_sort(array, tempArray, LS, center + 1, RE);
+  }
+}
+
+/**
+ * 一趟归并
+ * @param {*} array 原数组
+ * @param {*} tempArray 临时数组
+ * @param {*} arrayLength 数组长度
+ * @param {*} length 归并对的长度
+ */
+function iter_merge_core(array, tempArray, arrayLength, length) {
+  let i = 0;
+  for (; i <= arrayLength - 2 * length; i += 2 * length) {
+    m_sort(array, tempArray, i, i + length, i + 2 * length - 1);
+  }
+  if (i + length < arrayLength) {
+    // 归并最后两个子列
+    m_sort(array, tempArray, i, i + length, arrayLength - 1);
+  } else {
+    // 最后只剩下一个子列
+    for (let j = i; j < arrayLength; j += 1) {
+      tempArray[j] = array[j];
+    }
+  }
+}
+
+/**
+ * 归并排序，非递归实现
+ * @param {*} array
+ */
+function merge_sort2(array) {
+  let length = 1;
+  const arrayLength = array.length;
+  const tempArray = new Array(array.length);
+  while (length < arrayLength) {
+    iter_merge_core(array, tempArray, arrayLength, length);
+    length *= 2;
+  }
+}
 
 module.exports = {
-  m_sort
+  merge_sort1,
+  merge_sort2
 };
 /**
  * test
