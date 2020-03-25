@@ -1,7 +1,7 @@
 /*
- * @lc app=leetcode.cn id=148 lang=javascript
+ * @lc app=leetcode.cn id=23 lang=javascript
  *
- * [148] 排序链表
+ * [23] 合并K个排序链表
  */
 
 // @lc code=start
@@ -13,39 +13,10 @@
  * }
  */
 /**
- * 快排
- * @param {ListNode} head
+ * @param {ListNode[]} lists
  * @return {ListNode}
  */
-var sortList = function(head) {
-  const array = [];
-  while (head) {
-    array.push(head.val);
-    head = head.next;
-  }
-  array.sort(function(a, b) {
-    return a - b;
-  });
-  const preHead = new ListNode();
-  let p = preHead;
-  for (let i = 0; i < array.length; i += 1) {
-    p.next = new ListNode(array[i]);
-    p = p.next;
-  }
-  return preHead.next;
-};
-// @lc code=end
-
-/**
- * 归并排序
- * 递归实现
- * 1 找到链表中点
- * 2 分别归并子序列
- * 3 如何合并链表子序列
- * @param {ListNode} head
- * @return {ListNode}
- */
-var sortList2 = function(head) {
+var mergeKLists = function(lists) {
   const mergeList = (leftList, rightList) => {
     const result = new ListNode();
     let p = result;
@@ -62,6 +33,7 @@ var sortList2 = function(head) {
     p.next = leftList ? leftList : rightList;
     return result.next;
   };
+
   const mergeSort = node => {
     if (!node || !node.next) return node;
     let mid = node,
@@ -76,5 +48,17 @@ var sortList2 = function(head) {
     mid.next = null;
     return mergeList(mergeSort(node), mergeSort(rightList));
   };
-  return mergeSort(head);
+
+  merge_array_loop = (array, LS, RE) => {
+    if (LS < RE) {
+      const center = Math.floor((RE + LS) / 2);
+      const l = merge_array_loop(array, LS, center);
+      const r = merge_array_loop(array, center + 1, RE);
+      return mergeList(mergeSort(l), mergeSort(r));
+    } else {
+      return array[LS];
+    }
+  };
+  return lists.length > 0 ? merge_array_loop(lists, 0, lists.length - 1) : null;
 };
+// @lc code=end
