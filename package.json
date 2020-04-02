@@ -2,7 +2,7 @@
   "name": "reWrite",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "leetcode/136.只出现一次的数字.js",
   "scripts": {
     "testPromise": "promises-aplus-tests promise.js"
   },
