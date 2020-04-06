@@ -11,24 +11,15 @@
         );
       }
       setTimeout(function () {
+        var k = 0;
         var root = document.getElementById("root");
-        function loop(n) {
-          var k = 0;
-          console.log(n);
-          for (var i = 0; i < 100; i++) {
-            k += new Date() - 0;
-            var el = document.createElement("div");
-            el.innerHTML = k;
-            root.appendChild(el);
-            el.style.cssText = `background:${randomHexColor()};height:40px`;
-          }
-          if (n) {
-            setTimeout(function () {
-              loop(n - 1);
-            }, 40);
-          }
+        for (var i = 0; i < 10000; i++) {
+          k += new Date() - 0;
+          var el = document.createElement("div");
+          el.innerHTML = k;
+          root.appendChild(el);
+          el.style.cssText = `background:${randomHexColor()};height:40px`;
         }
-        loop(100);
       }, 1000);
     </script>
   </head>
